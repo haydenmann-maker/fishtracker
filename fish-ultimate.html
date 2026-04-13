@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a1628">
+    <title>MN Fish Tracker Ultimate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #151922;
+            --bg-card: #1a1f2e;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --accent-light: #7dd3fc;
+            --success: #34d399;
+            --gold: #fbbf24;
+            --border: #2d3748;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-light);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 4px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        
+        .tab {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+        
+        .content {
+            display: none;
+        }
+        
+        .content.active {
+            display: block;
+        }
+        
+        .species-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        
+        .species-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .species-card.caught {
+            border-color: var(--success);
+            background: rgba(52, 211, 153, 0.1);
+        }
+        
+        .species-card.uncaught {
+            opacity: 0.4;
+        }
+        
+        .species-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .species-count {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .trophy-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        textarea {
+            resize: vertical;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .section-header {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 20px 0 12px 0;
+            padding: 10px 14px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 8px;
+            color: var(--accent-light);
+        }
+        
+        button[type="submit"], .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .photo-upload {
+            margin: 16px 0;
+        }
+        
+        .camera-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(52, 211, 153, 0.2);
+            border: 2px dashed rgba(52, 211, 153, 0.5);
+            border-radius: 8px;
+            color: var(--success);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .photo-preview img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid var(--border);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+        
+        .modal-content {
+            background-color: var(--bg-card);
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close-modal {
+            color: var(--text-secondary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Minnesota Fish Tracker</h1>
+            <div class="subtitle">Complete Fishing Log & Analysis</div>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="speciesCaught">0</div>
+                    <div class="stat-label">Species</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalCatches">0</div>
+                    <div class="stat-label">Catches</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="trophyCount">0</div>
+                    <div class="stat-label">Trophies</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="completion">0%</div>
+                    <div class="stat-label">Complete</div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('species', event)">Species</button>
+            <button class="tab" onclick="showTab('log', event)">Log</button>
+            <button class="tab" onclick="showTab('analytics', event)">Analytics</button>
+            <button class="tab" onclick="showTab('patterns', event)">Patterns</button>
+            <button class="tab" onclick="showTab('ai', event)">AI Guide</button>
+            <button class="tab" onclick="showTab('forecast', event)">Forecast</button>
+            <button class="tab" onclick="showTab('history', event)">History</button>
+        </div>
+        
+        <!-- SPECIES TAB -->
+        <div id="species" class="content active">
+            <div class="species-grid" id="speciesGrid"></div>
+            <div style="display: flex; gap: 8px; margin-top: 24px; justify-content: center; padding-bottom: 20px;">
+                <button onclick="exportData()" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.25); color: var(--accent-light); padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase;">💾 Backup</button>
+                <button onclick="document.getElementById('importFile').click()" style="background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.25); color: var(--success); padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase;">📂 Restore</button>
+            </div>
+            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+        </div>
+        
+        <!-- LOG TAB -->
+        <div id="log" class="content">
+            <div style="background: var(--bg-card); padding: 20px; border-radius: 16px; border: 1px solid var(--border);">
+                <h2 style="margin-bottom: 20px; font-size: 20px;">Log New Catch</h2>
+                <form id="catchForm">
+                    <div class="form-group">
+                        <label>Species *</label>
+                        <select id="speciesSelect" required>
+                            <option value="">Select species...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Fish Name <span style="font-size: 11px; color: var(--text-secondary);">(Auto-generated, editable)</span></label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="fishName" placeholder="e.g., Big Larry">
+                            <button type="button" onclick="generateFishName()" style="padding: 8px 16px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 13px; white-space: nowrap;">🎲 New Name</button>
+                        </div>
+                    </div>
+                    
+                    <div class="photo-upload">
+                        <label>Photos</label>
+                        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                            <button type="button" class="camera-btn" onclick="document.getElementById('photoInput').click()" style="flex: 1;">
+                                📷 Take/Upload Photo
+                            </button>
+                            <button type="button" class="camera-btn" onclick="document.getElementById('oldPhotoInput').click()" style="flex: 1; background: var(--bg-secondary); border: 1px solid var(--border);">
+                                🖼️ Add Old Picture
+                            </button>
+                        </div>
+                        <input type="file" id="photoInput" accept="image/*" capture="environment" style="display: none;" multiple>
+                        <input type="file" id="oldPhotoInput" accept="image/*" style="display: none;" multiple>
+                        <div class="photo-preview" id="photoPreview"></div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Length (inches) *</label>
+                            <input type="number" id="length" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Weight (lbs)</label>
+                            <input type="number" id="weight" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <input type="text" id="location" required placeholder="Lake name, spot">
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Date *</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="time" id="time">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Lure/Bait</label>
+                        <input type="text" id="lure" placeholder="Type and color">
+                    </div>
+                    
+                    <div class="section-header">🌡️ Environmental Conditions</div>
+                    
+                    <div style="background: rgba(56, 189, 248, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 3px solid var(--accent);">
+                        <div style="font-size: 12px; color: var(--text-primary); line-height: 1.6;">
+                            <strong>📍 Auto-Calculated:</strong> Moon phase, solunar periods, time of day, and condition factor are calculated automatically when you log the catch. Date/time are pre-filled with current values.
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Water Temp (°F)</label>
+                            <input type="number" id="waterTemp" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Air Temp (°F)</label>
+                            <input type="number" id="airTemp" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Pressure (inHg)</label>
+                            <input type="number" id="pressure" step="0.01" placeholder="29.92">
+                        </div>
+                        <div class="form-group">
+                            <label>Pressure Trend</label>
+                            <select id="pressureTrend">
+                                <option value="">Unknown</option>
+                                <option value="rising">Rising ↗️</option>
+                                <option value="stable">Stable →</option>
+                                <option value="falling">Falling ↘️</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Wind Speed (mph)</label>
+                            <input type="number" id="windSpeed" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Wind Direction</label>
+                            <select id="windDirection">
+                                <option value="">Unknown</option>
+                                <option value="N">N</option>
+                                <option value="NE">NE</option>
+                                <option value="E">E</option>
+                                <option value="SE">SE</option>
+                                <option value="S">S</option>
+                                <option value="SW">SW</option>
+                                <option value="W">W</option>
+                                <option value="NW">NW</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Sky Condition</label>
+                            <select id="skyCondition">
+                                <option value="">Unknown</option>
+                                <option value="sunny">☀️ Sunny</option>
+                                <option value="partly-cloudy">⛅ Partly Cloudy</option>
+                                <option value="overcast">☁️ Overcast</option>
+                                <option value="rain">🌧️ Rain</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Water Clarity (ft)</label>
+                            <input type="number" id="waterClarity" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">🎣 Catch Details</div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Fight Time (sec)</label>
+                            <input type="number" id="fightTime">
+                        </div>
+                        <div class="form-group">
+                            <label>Depth (ft)</label>
+                            <input type="number" id="depth" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Structure</label>
+                            <select id="structure">
+                                <option value="">Unknown</option>
+                                <option value="weeds">Weeds</option>
+                                <option value="rocks">Rocks</option>
+                                <option value="timber">Timber</option>
+                                <option value="dock">Dock</option>
+                                <option value="dropoff">Drop-off</option>
+                                <option value="points">Points</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Release Condition</label>
+                            <select id="releaseCondition">
+                                <option value="">Unknown</option>
+                                <option value="excellent">Excellent</option>
+                                <option value="good">Good</option>
+                                <option value="fair">Fair</option>
+                                <option value="kept">Kept</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="notes" rows="3" placeholder="Observations, behavior, etc."></textarea>
+                    </div>
+                    
+                    <button type="submit">Log Catch</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- ANALYTICS TAB -->
+        <div id="analytics" class="content">
+            <div id="analyticsContent"></div>
+        </div>
+        
+        <!-- PATTERNS TAB -->
+        <div id="patterns" class="content">
+            <div id="patternsContent"></div>
+        </div>
+        
+        <!-- AI GUIDE TAB -->
+        <div id="ai" class="content">
+            <div style="background: var(--bg-card); padding: 20px; border-radius: 16px; border: 1px solid var(--border);">
+                <h2 style="margin-bottom: 16px;">Bass Fishing AI</h2>
+                <div id="chatMessages" style="background: var(--bg-secondary); border-radius: 12px; padding: 16px; min-height: 350px; max-height: 450px; overflow-y: auto; margin-bottom: 12px; border: 1px solid var(--border);">
+                    <div style="text-align: center; color: var(--text-secondary); padding: 40px 20px;">
+                        <div style="font-size: 48px; margin-bottom: 12px;">🎣</div>
+                        <div>Ask about lures, water temps, time of day, or techniques</div>
+                    </div>
+                </div>
+                <input type="text" id="chatInput" placeholder="Ask about fishing..." style="margin-bottom: 12px;" onkeypress="if(event.key==='Enter') sendAIMessage()">
+                <button onclick="sendAIMessage()" class="btn">Send</button>
+            </div>
+        </div>
+        
+        <!-- FORECAST TAB -->
+        <div id="forecast" class="content">
+            <div id="forecastContent"></div>
+        </div>
+        
+        <!-- HISTORY TAB -->
+        <div id="history" class="content">
+            <div id="historyContent"></div>
+        </div>
+        
+        <!-- Photo Modal -->
+        <div id="photoModal" class="modal" onclick="if(event.target===this) this.style.display='none'">
+            <div style="position: relative; max-width: 90%; max-height: 90%; margin: 50px auto;">
+                <span class="close-modal" onclick="document.getElementById('photoModal').style.display='none'">&times;</span>
+                <img id="photoModalImg" style="width: 100%; border-radius: 8px;">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Minnesota Master Angler Trophy Standards
+        const trophyStandards = {
+            1: { name: "Largemouth Bass", minLength: 21, minWeight: 5.44 },
+            2: { name: "Smallmouth Bass", minLength: 21, minWeight: 5.94 },
+            3: { name: "Walleye", minLength: 26, minWeight: 6.31 },
+            4: { name: "Northern Pike", minLength: 40, minWeight: 18.31 },
+            5: { name: "Muskellunge", minLength: 46, minWeight: 27.75 },
+            6: { name: "Bluegill", minLength: 11, minWeight: 1.31 },
+            7: { name: "Pumpkinseed", minLength: 9, minWeight: 0.75 },
+            8: { name: "Black Crappie", minLength: 15, minWeight: 2.25 },
+            9: { name: "White Crappie", minLength: 15, minWeight: 1.94 },
+            10: { name: "Yellow Perch", minLength: 15, minWeight: 1.94 },
+            11: { name: "Rock Bass", minLength: 10, minWeight: 0.88 },
+            12: { name: "Lake Trout", minLength: 34, minWeight: 15.75 },
+            13: { name: "Brook Trout", minLength: 20, minWeight: 3.5 },
+            14: { name: "Rainbow Trout", minLength: 32, minWeight: 15.63 },
+            15: { name: "Brown Trout", minLength: 25, minWeight: 8.13 },
+            16: { name: "Channel Catfish", minLength: 30, minWeight: 11.94 },
+            17: { name: "Flathead Catfish", minLength: 33, minWeight: 16.38 },
+            18: { name: "White Bass", minLength: 16, minWeight: 2.06 },
+            19: { name: "Sauger", minLength: 22, minWeight: 3.5 },
+            20: { name: "Burbot", minLength: 32, minWeight: 9.06 },
+            21: { name: "Lake Sturgeon", minLength: 54, minWeight: 21.63 },
+            22: { name: "Lake Whitefish", minLength: 24, minWeight: 5.56 }
+        };
+
+        const mnSpecies = [
+            { id: 1, name: "Largemouth Bass", scientific: "Micropterus salmoides" },
+            { id: 2, name: "Smallmouth Bass", scientific: "Micropterus dolomieu" },
+            { id: 3, name: "Walleye", scientific: "Sander vitreus" },
+            { id: 4, name: "Northern Pike", scientific: "Esox lucius" },
+            { id: 5, name: "Muskellunge", scientific: "Esox masquinongy" },
+            { id: 6, name: "Bluegill", scientific: "Lepomis macrochirus" },
+            { id: 7, name: "Pumpkinseed", scientific: "Lepomis gibbosus" },
+            { id: 8, name: "Black Crappie", scientific: "Pomoxis nigromaculatus" },
+            { id: 9, name: "White Crappie", scientific: "Pomoxis annularis" },
+            { id: 10, name: "Yellow Perch", scientific: "Perca flavescens" },
+            { id: 11, name: "Rock Bass", scientific: "Ambloplites rupestris" },
+            { id: 12, name: "Lake Trout", scientific: "Salvelinus namaycush" },
+            { id: 13, name: "Brook Trout", scientific: "Salvelinus fontinalis" },
+            { id: 14, name: "Rainbow Trout", scientific: "Oncorhynchus mykiss" },
+            { id: 15, name: "Brown Trout", scientific: "Salmo trutta" },
+            { id: 16, name: "Channel Catfish", scientific: "Ictalurus punctatus" },
+            { id: 17, name: "Flathead Catfish", scientific: "Pylodictis olivaris" },
+            { id: 18, name: "White Bass", scientific: "Morone chrysops" },
+            { id: 19, name: "Sauger", scientific: "Sander canadensis" },
+            { id: 20, name: "Burbot", scientific: "Lota lota" },
+            { id: 21, name: "Lake Sturgeon", scientific: "Acipenser fulvescens" },
+            { id: 22, name: "Lake Whitefish", scientific: "Coregonus clupeaformis" }
+        ]; 
+        let catches = JSON.parse(localStorage.getItem('catches') || '[]');
+        let tempPhotos = [];
+        
+        // Fish Name Generator - Famous bass names + creative combos
+        const fishNames = {
+            bass: ['Big Larry', 'Bucketmouth', 'Lunker Luke', 'Hawg Hunter', 'George Perry Jr.', 'Dottie Jr.', 'The Colonel', 'Big Mama', 'Linebacker', 'Chonk', 'Tank', 'Boss Hog', 'Green Machine', 'Butterball', 'Thicc Rick', 'Slab', 'Donkey', 'Toad', 'Pig', 'Unit', 'Absolute Unit', 'Kevin VanDam', 'Ray Scott', 'Mike Iaconelli', 'Roland Martin', 'Bill Dance', 'Hank Parker', 'Rick Clunn'],
+            pike: ['Toothy Tim', 'Water Wolf', 'Snaggle', 'Pike Tyson', 'Esox King', 'Green Missile', 'Slimer', 'Gator', 'Chomper', 'Jack the Ripper', 'Northern Nightmare', 'Torpedo', 'Pike Mike', 'Snaggletooth', 'The Beast'],
+            muskie: ['Esox Rex', 'The Legend', 'Lunge Larry', 'Muskie Madness', 'Fish of 10,000 Casts', 'Queen of the Lake', 'Water Tiger', 'Apex Predator', 'The Submarine', 'Freshwater Shark'],
+            walleye: ['Marble Eyes', 'Golden Glow', 'Wallie', 'Old Yeller', 'Pickeral Pete', 'Sauger Cousin', 'Night Vision', 'Glass Eye Gary', 'Manitoba Monster', 'Erie Queen'],
+            panfish: ['Sunny', 'Gill Bill', 'Pumpkin', 'Slab Master', 'Bream Dream', 'Copper Nose', 'Dinner Plate', 'Hand Size', 'The Bull', 'Blue Boy', 'Pumpkin Spice', 'Pan Commander'],
+            trout: ['Speckles', 'Rainbow Warrior', 'Brownie', 'Brook Master', 'Spot', 'Slippery Pete', 'Native Prince', 'Trophy Tom', 'Stream King', 'Fatty McGee'],
+            catfish: ['Whiskers', 'Mud Puppy', 'Old Man River', 'Bottom Dweller', 'Cat Daddy', 'Channel Champ', 'Flathead Fred', 'Stinky Steve', 'Monster Mudcat', 'Big Cat'],
+            perch: ['Stripes', 'Yellow Belly', 'Perch Master', 'Jumbo Joe', 'Lake Erie Legend', 'Stripy'],
+            sturgeon: ['Living Fossil', 'Prehistoric Pete', 'Ancient One', 'Caviar King', 'Time Traveler', 'Dinosaur Fish'],
+            generic: ['Fin-tastic', 'Mr. Fish', 'The Catch', 'Beauty', 'Trophy', 'The One', 'Lucky', 'Fighter', 'Worthy Opponent', 'Memory Maker']
+        };
+        
+        
+        // Initialize
+        document.getElementById('date').valueAsDate = new Date();
+        document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
+        document.getElementById('oldPhotoInput').addEventListener('change', handlePhotoUpload);
+        
+        // Auto-populate current time
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('time').value = `${hours}:${minutes}`;
+        
+        initApp();
+        
+        function initApp() {
+            renderSpecies();
+            populateSpeciesSelect();
+            updateStats();
+            renderHistory();
+        }
+        
+        function showTab(tabName, e) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            
+            if (e && e.target) e.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'analytics') renderAnalytics();
+            if (tabName === 'patterns') renderPatterns();
+            if (tabName === 'forecast') renderForecast();
+            if (tabName === 'history') renderHistory();
+        }
+        
+        function populateSpeciesSelect() {
+            const select = document.getElementById('speciesSelect');
+            mnSpecies.forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.id;
+                option.textContent = s.name;
+                select.appendChild(option);
+            });
+        }
+        
+        function handlePhotoUpload(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    tempPhotos.push(event.target.result);
+                    renderPhotoPreview();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function renderPhotoPreview() {
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = tempPhotos.map((photo, i) => `
+                <div style="position: relative;">
+                    <img src="${photo}">
+                    <button type="button" onclick="removePhoto(${i})" style="position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold;">×</button>
+                </div>
+            `).join('');
+        }
+        
+        function removePhoto(index) {
+            tempPhotos.splice(index, 1);
+            renderPhotoPreview();
+        }
+        
+        // Check if trophy
+        function isTrophy(speciesId, length, weight) {
+            const standard = trophyStandards[speciesId];
+            if (!standard) return false;
+            return length >= standard.minLength || (weight && weight >= standard.minWeight);
+        }
+        
+        // Form submission
+        // Fish Name Generator
+        function generateFishName(species, isTrophy, length) {
+            if (!species) {
+                return 'Mystery Fish';
+            }
+            
+            const bassNames = [
+                // Classic two-word
+                'Lunker Larry', 'Big Mouth Billy', 'Hank the Tank', 'Bucketmouth Bob', 'Monster Mike', 
+                'Linebacker Lou', 'Chunk Charlie', 'Hawg Harold', 'Boss Bass', 'King Kevin', 
+                'Bruiser Bruce', 'Slab Steve', 'Moose Marcus', 'Tank Tony', 'Crusher Carl', 
+                'Beast Barry', 'Gordo Greg', 'Toad Tommy', 'Swampy Sam',
+                // Flair/BamaBass one-word style
+                'Bertha', 'Hoss', 'Sheila', 'Brutus', 'Bubba', 'Cletus', 'Daisy', 'Duke', 
+                'Tiny', 'Goliath', 'Hammer', 'Kong', 'Maximus', 'Nasty', 'Otis', 'Precious',
+                'Rosie', 'Sarge', 'Tank', 'Vader', 'Zeus', 'Abby', 'Bella', 'Chonk',
+                'Diesel', 'Elvis', 'Fiona', 'Gator', 'Hulk', 'Ivan', 'Jaws', 'Killer',
+                'Lucy', 'Marge', 'Nitro', 'Odie', 'Petunia', 'Quake', 'Rhino', 'Sadie',
+                'Thor', 'Unit', 'Vixen', 'Wilma', 'Xena', 'Yeti', 'Zilla', 'Ace',
+                'Bam', 'Chief', 'Dude', 'Earl', 'Floyd', 'Gus', 'Hank', 'Izzy',
+                'Junior', 'Karma', 'Lefty', 'Mongo', 'Nellie', 'Oscar', 'Pearl', 'Rex',
+                'Stella', 'Thumper', 'Uggo', 'Viper', 'Wanda', 'Xtreme', 'Yo-Yo', 'Zippy'
+            ];
+            
+            const pikeNames = [
+                'Toothy Tom', 'Gator Gary', 'Snaggle Steve', 'Rocket Rick', 'Missile Mike', 
+                'Torpedo Tony', 'Slasher Sam', 'Chomp Charlie', 'Razor Ray', 'Strike Steve', 
+                'Water Wolf', 'Ambush Andy', 'Pike Pete', 'Needle Nose', 'Fangs Frank',
+                'Snapper', 'Fang', 'Ripper', 'Spike', 'Jaws', 'Slash', 'Dagger', 'Blade',
+                'Striker', 'Hunter', 'Predator', 'Torpedo', 'Bullet', 'Arrow'
+            ];
+            
+            const walleyeNames = [
+                'Marble Eye Mike', 'Golden Gary', 'Glassy Glenn', 'Twilight Tom', 'Deep Doug', 
+                'Walleye Willie', 'Jigging Joe', 'Rocky Ralph', 'Ledge Larry', 'Marble Mark',
+                'Peepers', 'Glassy', 'Golden', 'Marble', 'Spooky', 'Ghost', 'Shadow', 'Twilight'
+            ];
+            
+            const panfishNames = [
+                'Sunny Sam', 'Gill Gary', 'Slab Steve', 'Bluey Bob', 'Papermouth Pete', 
+                'Crappie Carl', 'Perch Paul', 'Stripe Steve', 'Pan Pete', 'Dinner Dave',
+                'Sunny', 'Gilly', 'Slabby', 'Blue', 'Specs', 'Stripey', 'Goldie', 'Nibbles',
+                'Saucer', 'Plate', 'Cookie', 'Dinnerbell', 'Keeper', 'Bait', 'Snack'
+            ];
+            
+            const troutNames = [
+                'Rainbow Ron', 'Brook Brad', 'Brown Bill', 'Speckled Sam', 'Stream Steve', 
+                'Cold Water Carl', 'Mountain Mike', 'River Rick', 'Spring Steve', 'Native Nick',
+                'Rainbow', 'Brookie', 'Brownie', 'Speck', 'Streamer', 'Springer', 'Brook',
+                'Leaper', 'Jumper', 'Splash', 'Native', 'Wild'
+            ];
+            
+            const muskieNames = [
+                'Muskie Max', 'Monster Marsh', 'Legend Larry', 'Titan Tom', 'Beast Brad', 
+                'Goliath Greg', 'Mythic Mike', 'Giant Gary', 'Colossus Carl', 'Leviathan Lou',
+                'Legend', 'Titan', 'Beast', 'Goliath', 'Monster', 'Myth', 'Giant', 'Loch',
+                'Nessie', 'Godzilla', 'Kraken', 'Dragon'
+            ];
+            
+            const catfishNames = [
+                'Whisker Will', 'Mudcat Mike', 'Channel Chad', 'Flathead Frank', 'Bottom Bob', 
+                'Cat Carl', 'Whiskers Walt', 'Muddy Mark', 'Catty Cal', 'River Ron',
+                'Whiskers', 'Muddy', 'Flatty', 'Channel', 'Bottom', 'Slimer', 'Mudcat',
+                'Whopper', 'Tank', 'Pudge'
+            ];
+            
+            const generalNames = [
+                'Finny Fred', 'Swimmer Sam', 'Catch Chris', 'Fisher Fred', 'Lake Lou', 
+                'Water Willie', 'River Ron', 'Hook Harry', 'Net Nick', 'Reel Rick',
+                'Lucky', 'Keeper', 'Beauty', 'Champ', 'Winner', 'Prize', 'Gem', 'Star'
+            ];
+            
+            let nameList = generalNames;
+            const speciesLower = species.toLowerCase();
+            
+            if (speciesLower.includes('bass')) nameList = bassNames;
+            else if (speciesLower.includes('pike')) nameList = pikeNames;
+            else if (speciesLower.includes('muskie') || speciesLower.includes('muskellunge')) nameList = muskieNames;
+            else if (speciesLower.includes('walleye') || speciesLower.includes('sauger')) nameList = walleyeNames;
+            else if (speciesLower.includes('gill') || speciesLower.includes('crappie') || speciesLower.includes('perch') || speciesLower.includes('pumpkinseed')) nameList = panfishNames;
+            else if (speciesLower.includes('trout')) nameList = troutNames;
+            else if (speciesLower.includes('catfish')) nameList = catfishNames;
+            
+            // Prefix for trophies
+            const prefix = isTrophy ? 'Trophy ' : '';
+            const randomName = nameList[Math.floor(Math.random() * nameList.length)];
+            
+            return prefix + randomName;
+        }
+        
+        document.getElementById('catchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const speciesId = parseInt(document.getElementById('speciesSelect').value);
+            if (!speciesId) {
+                alert('Please select a species!');
+                return;
+            }
+            
+            const species = mnSpecies.find(s => s.id === speciesId);
+            if (!species) {
+                alert('Species not found!');
+                return;
+            }
+            
+            const dateValue = document.getElementById('date').value;
+            const timeValue = document.getElementById('time').value;
+            const lengthValue = parseFloat(document.getElementById('length').value);
+            const weightValue = document.getElementById('weight').value ? parseFloat(document.getElementById('weight').value) : null;
+            const isTrophyFish = isTrophy(speciesId, lengthValue, weightValue);
+            
+            const catchData = {
+                id: Date.now(),
+                speciesId: speciesId,
+                species: species.name,
+                fishName: generateFishName(species.name, isTrophyFish, lengthValue),
+                length: lengthValue,
+                weight: weightValue,
+                location: document.getElementById('location').value,
+                date: dateValue,
+                time: timeValue,
+                lure: document.getElementById('lure').value,
+                photos: [...tempPhotos],
+                waterTemp: document.getElementById('waterTemp').value ? parseFloat(document.getElementById('waterTemp').value) : null,
+                airTemp: document.getElementById('airTemp').value ? parseFloat(document.getElementById('airTemp').value) : null,
+                pressure: document.getElementById('pressure').value ? parseFloat(document.getElementById('pressure').value) : null,
+                pressureTrend: document.getElementById('pressureTrend').value,
+                windSpeed: document.getElementById('windSpeed').value ? parseFloat(document.getElementById('windSpeed').value) : null,
+                windDirection: document.getElementById('windDirection').value,
+                skyCondition: document.getElementById('skyCondition').value,
+                waterClarity: document.getElementById('waterClarity').value ? parseFloat(document.getElementById('waterClarity').value) : null,
+                fightTime: document.getElementById('fightTime').value ? parseInt(document.getElementById('fightTime').value) : null,
+                depth: document.getElementById('depth').value ? parseFloat(document.getElementById('depth').value) : null,
+                structure: document.getElementById('structure').value,
+                releaseCondition: document.getElementById('releaseCondition').value,
+                notes: document.getElementById('notes').value,
+                conditionFactor: calculateConditionFactor(lengthValue, weightValue),
+                moonPhase: getMoonPhase(dateValue),
+                estimatedAge: estimateAge(species.name, lengthValue),
+                timeOfDay: getTimeOfDay(timeValue),
+                isTrophy: isTrophyFish
+            };
+            
+            catches.push(catchData);
+            localStorage.setItem('catches', JSON.stringify(catches));
+            
+            tempPhotos = [];
+            document.getElementById('catchForm').reset();
+            document.getElementById('date').valueAsDate = new Date();
+            
+            // Re-populate current time after reset
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('time').value = `${hours}:${minutes}`;
+            
+            renderPhotoPreview();
+            updateStats();
+            renderSpecies();
+            
+            alert(`✅ Catch logged! Named: ${catchData.fishName}`);
+        });
+        
+        // Scientific Calculations
+        function calculateConditionFactor(length, weight) {
+            if (!weight || !length) return null;
+            const weightGrams = weight * 453.592;
+            const lengthCm = length * 2.54;
+            return ((weightGrams / Math.pow(lengthCm, 3)) * 100000).toFixed(2);
+        }
+        
+        function getMoonPhase(date) {
+            const d = new Date(date);
+            const year = d.getFullYear();
+            let month = d.getMonth() + 1;
+            const day = d.getDate();
+            
+            let c, e, jd, b;
+            if (month < 3) {
+                year--;
+                month += 12;
+            }
+            ++month;
+            c = 365.25 * year;
+            e = 30.6 * month;
+            jd = c + e + day - 694039.09;
+            jd /= 29.5305882;
+            b = parseInt(jd);
+            jd -= b;
+            b = Math.round(jd * 8);
+            
+            if (b >= 8) b = 0;
+            
+            const phases = ['New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous', 'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent'];
+            const phaseRatings = [5, 3, 4, 4, 5, 4, 4, 3];
+            
+            return {
+                name: phases[b],
+                rating: phaseRatings[b],
+                illumination: (jd * 100).toFixed(0)
+            };
+        }
+        
+        function estimateAge(species, length) {
+            const growthRates = {
+                'Largemouth Bass': [
+                    { age: 1, length: 4.5 }, { age: 2, length: 8.5 }, { age: 3, length: 11.5 },
+                    { age: 4, length: 13.5 }, { age: 5, length: 15.0 }, { age: 6, length: 16.5 },
+                    { age: 7, length: 17.5 }, { age: 8, length: 18.5 }, { age: 10, length: 20.0 }
+                ],
+                'Smallmouth Bass': [
+                    { age: 1, length: 3.5 }, { age: 2, length: 7.0 }, { age: 3, length: 10.0 },
+                    { age: 4, length: 12.0 }, { age: 5, length: 13.5 }, { age: 6, length: 15.0 },
+                    { age: 7, length: 16.0 }, { age: 8, length: 17.0 }, { age: 10, length: 18.5 }
+                ],
+                'Northern Pike': [
+                    { age: 1, length: 10.0 }, { age: 2, length: 16.0 }, { age: 3, length: 21.0 },
+                    { age: 4, length: 25.0 }, { age: 5, length: 28.5 }, { age: 6, length: 31.5 },
+                    { age: 8, length: 36.0 }, { age: 10, length: 40.0 }
+                ],
+                'Walleye': [
+                    { age: 1, length: 6.5 }, { age: 2, length: 10.5 }, { age: 3, length: 13.5 },
+                    { age: 4, length: 15.5 }, { age: 5, length: 17.5 }, { age: 6, length: 19.0 },
+                    { age: 8, length: 21.5 }, { age: 10, length: 24.0 }
+                ]
+            };
+            
+            if (!growthRates[species]) return null;
+            
+            const rates = growthRates[species];
+            for (let i = 0; i < rates.length - 1; i++) {
+                if (length >= rates[i].length && length < rates[i + 1].length) {
+                    const ratio = (length - rates[i].length) / (rates[i + 1].length - rates[i].length);
+                    const estimatedAge = rates[i].age + ratio * (rates[i + 1].age - rates[i].age);
+                    return Math.round(estimatedAge * 10) / 10;
+                }
+            }
+            
+            if (length >= rates[rates.length - 1].length) {
+                return `${rates[rates.length - 1].age}+`;
+            }
+            
+            return rates[0].age;
+        }
+        
+        function getTimeOfDay(time) {
+            if (!time) return null;
+            const hour = parseInt(time.split(':')[0]);
+            if (hour >= 5 && hour < 8) return 'Dawn';
+            if (hour >= 8 && hour < 11) return 'Morning';
+            if (hour >= 11 && hour < 15) return 'Midday';
+            if (hour >= 15 && hour < 18) return 'Afternoon';
+            if (hour >= 18 && hour < 21) return 'Dusk';
+            return 'Night';
+        }
+        
+        // Update stats
+        function updateStats() {
+            const speciesCaught = new Set(catches.map(c => c.speciesId)).size;
+            const totalCatches = catches.length;
+            const trophyCount = catches.filter(c => c.isTrophy).length;
+            const completion = ((speciesCaught / mnSpecies.length) * 100).toFixed(0);
+            
+            document.getElementById('speciesCaught').textContent = speciesCaught;
+            document.getElementById('totalCatches').textContent = totalCatches;
+            document.getElementById('trophyCount').textContent = trophyCount;
+            document.getElementById('completion').textContent = completion + '%';
+        }
+        
+        // Render Species Grid
+        function renderSpecies() {
+            const grid = document.getElementById('speciesGrid');
+            grid.innerHTML = mnSpecies.map(s => {
+                const speciesCatches = catches.filter(c => c.speciesId === s.id);
+                const caught = speciesCatches.length > 0;
+                const hasTrophy = speciesCatches.some(c => c.isTrophy);
+                
+                // Find biggest catch with photo
+                let biggestPhoto = null;
+                if (caught) {
+                    const catchesWithPhotos = speciesCatches.filter(c => c.photos && c.photos.length > 0);
+                    if (catchesWithPhotos.length > 0) {
+                        const biggest = catchesWithPhotos.sort((a, b) => b.length - a.length)[0];
+                        biggestPhoto = biggest.photos[0];
+                    }
+                }
+                
+                let photoHtml = '';
+                if (biggestPhoto) {
+                    photoHtml = '<img src="' + biggestPhoto + '" style="width: 100%; height: 100%; object-fit: cover;" alt="' + s.name + '">';
+                } else {
+                    photoHtml = '<div style="color: var(--text-secondary); font-size: 11px; text-align: center; padding: 10px;">No photo yet</div>';
+                }
+                
+                const countText = caught ? speciesCatches.length + ' caught' : 'Not caught';
+                
+                return `
+                    <div class="species-card ${caught ? 'caught' : 'uncaught'}">
+                        ${hasTrophy ? '<div class="trophy-badge">🏆</div>' : ''}
+                        <div style="width: 100%; height: 100px; background: ${biggestPhoto ? 'transparent' : 'rgba(255,255,255,0.03)'}; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                            ${photoHtml}
+                        </div>
+                        <div class="species-name">${s.name}</div>
+                        <div class="species-count">${countText}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Render Analytics
+        function renderAnalytics() {
+            if (catches.length === 0) {
+                document.getElementById('analyticsContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">Log catches to see analytics</div>';
+                return;
+            }
+            
+            const avgWaterTemp = catches.filter(c => c.waterTemp).reduce((sum, c) => sum + c.waterTemp, 0) / catches.filter(c => c.waterTemp).length || 0;
+            const avgCondition = catches.filter(c => c.conditionFactor).reduce((sum, c) => sum + parseFloat(c.conditionFactor), 0) / catches.filter(c => c.conditionFactor).length || 0;
+            
+            const timeStats = {};
+            catches.forEach(c => {
+                if (c.timeOfDay) timeStats[c.timeOfDay] = (timeStats[c.timeOfDay] || 0) + 1;
+            });
+            
+            const pressureStats = {
+                rising: catches.filter(c => c.pressureTrend === 'rising').length,
+                stable: catches.filter(c => c.pressureTrend === 'stable').length,
+                falling: catches.filter(c => c.pressureTrend === 'falling').length
+            };
+            
+            let html = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-value">${avgWaterTemp.toFixed(1)}°F</div>
+                        <div class="stat-label">Avg Water Temp</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${avgCondition.toFixed(1)}</div>
+                        <div class="stat-label">Avg K-Factor</div>
+                    </div>
+                </div>
+                
+                <div style="background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px;">
+                    <h3 style="margin-bottom: 12px; font-size: 16px;">⏰ Time of Day</h3>
+                    <div style="display: grid; gap: 8px;">
+            `;
+            
+            Object.entries(timeStats).sort((a, b) => b[1] - a[1]).forEach(([time, count]) => {
+                const pct = ((count / catches.length) * 100).toFixed(0);
+                html += `
+                    <div style="display: flex; justify-content: space-between; padding: 10px; background: var(--bg-secondary); border-radius: 6px;">
+                        <span>${time}</span>
+                        <span style="color: var(--accent-light); font-weight: 700;">${count} (${pct}%)</span>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+                
+                <div style="background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px;">
+                    <h3 style="margin-bottom: 12px; font-size: 16px;">📊 Pressure Trend</h3>
+                    <div style="display: grid; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: var(--bg-secondary); border-radius: 6px;">
+                            <span>↘️ Falling (Best)</span>
+                            <span style="color: var(--success); font-weight: 700;">${pressureStats.falling}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: var(--bg-secondary); border-radius: 6px;">
+                            <span>→ Stable</span>
+                            <span style="color: var(--accent-light); font-weight: 700;">${pressureStats.stable}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: var(--bg-secondary); border-radius: 6px;">
+                            <span>↗️ Rising</span>
+                            <span style="color: var(--text-secondary); font-weight: 700;">${pressureStats.rising}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="exportToCSV()" style="width: 100%; padding: 14px; background: var(--success); color: var(--bg-primary); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase;">
+                    📊 Export to CSV
+                </button>
+            `;
+            
+            document.getElementById('analyticsContent').innerHTML = html;
+        }
+        
+        // Render Patterns
+        function renderPatterns() {
+            if (catches.length === 0) {
+                document.getElementById('patternsContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">Log catches to see patterns</div>';
+                return;
+            }
+            
+            const lureStats = {};
+            catches.forEach(c => {
+                if (c.lure) {
+                    if (!lureStats[c.lure]) {
+                        lureStats[c.lure] = { count: 0, totalLength: 0 };
+                    }
+                    lureStats[c.lure].count++;
+                    lureStats[c.lure].totalLength += c.length;
+                }
+            });
+            
+            const sortedLures = Object.entries(lureStats)
+                .map(([lure, stats]) => ({
+                    lure,
+                    count: stats.count,
+                    avgSize: (stats.totalLength / stats.count).toFixed(1)
+                }))
+                .sort((a, b) => b.count - a.count);
+            
+            const trophies = catches.filter(c => c.isTrophy);
+            
+            let trophyPattern = null;
+            if (trophies.length > 0) {
+                const trophyTemps = trophies.filter(c => c.waterTemp).map(c => c.waterTemp);
+                const trophyPressure = trophies.filter(c => c.pressureTrend).map(c => c.pressureTrend);
+                const trophyTime = trophies.filter(c => c.timeOfDay).map(c => c.timeOfDay);
+                
+                trophyPattern = {
+                    bestTemp: trophyTemps.length ? (trophyTemps.reduce((a, b) => a + b, 0) / trophyTemps.length).toFixed(1) : null,
+                    bestPressure: trophyPressure.length ? mode(trophyPressure) : null,
+                    bestTime: trophyTime.length ? mode(trophyTime) : null
+                };
+            }
+            
+            let html = '';
+            
+            if (trophyPattern) {
+                html += `
+                    <div style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.1)); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid rgba(251, 191, 36, 0.3);">
+                        <h3 style="margin-bottom: 12px; color: var(--gold); font-size: 18px;">🏆 YOUR TROPHY PATTERN (${trophies.length} fish)</h3>
+                        <div style="display: grid; gap: 10px;">
+                            ${trophyPattern.bestTemp ? `<div style="padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px;">🌡️ Best Temp: <strong style="color: var(--gold);">${trophyPattern.bestTemp}°F</strong></div>` : ''}
+                            ${trophyPattern.bestPressure ? `<div style="padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px;">📊 Best Pressure: <strong style="color: var(--gold);">${trophyPattern.bestPressure}</strong></div>` : ''}
+                            ${trophyPattern.bestTime ? `<div style="padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px;">⏰ Best Time: <strong style="color: var(--gold);">${trophyPattern.bestTime}</strong></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                <div style="background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                    <h3 style="margin-bottom: 12px; font-size: 16px;">🎣 Lure Success Rates</h3>
+                    <div style="display: grid; gap: 8px;">
+            `;
+            
+            sortedLures.forEach((l, i) => {
+                html += `
+                    <div style="padding: 12px; background: var(--bg-secondary); border-radius: 6px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <span style="font-weight: 700;">${i + 1}. ${l.lure}</span>
+                            <span style="color: var(--accent-light); font-weight: 700;">${l.count}</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Avg: ${l.avgSize}"</div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('patternsContent').innerHTML = html;
+        }
+        
+        function mode(arr) {
+            const freq = {};
+            arr.forEach(val => freq[val] = (freq[val] || 0) + 1);
+            return Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
+        }
+        
+        // Render Forecast
+        function renderForecast() {
+            const now = new Date();
+            const month = now.getMonth(); // 0-11
+            const day = now.getDate();
+            const hour = now.getHours();
+            const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+            
+            // Current date analysis
+            const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // Ice-out prediction for northern MN (Duluth area)
+            // Typical ice-out: late April to early May for most lakes
+            let iceOutStatus = '';
+            let seasonPhase = '';
+            let seasonRating = 3;
+            let waterTempRange = '';
+            let techniques = '';
+            let specificAdvice = '';
+            
+            // April 12, 2026 analysis
+            if (month === 3) { // April
+                if (day < 20) {
+                    iceOutStatus = 'STILL ICE COVERED - Most Duluth-area lakes remain frozen. Ice-out typically occurs April 20-May 5. Current ice thickness estimated 12-18 inches on inland lakes.';
+                    seasonPhase = 'Late Ice / Pre-Ice-Out';
+                    seasonRating = 2;
+                    waterTempRange = '33-36°F (under ice)';
+                    techniques = 'Ice fishing only. Target panfish and pike in 8-15ft near drop-offs. Smallmouth bass more active than largemouth in cold water.';
+                    specificAdvice = 'Focus on tip-ups with shiners for pike. Bluegills staging near spawning bays. Late ice = dangerous - check thickness. NOT open water fishing season yet.';
+                } else if (day >= 20 && day < 28) {
+                    iceOutStatus = 'ICE-OUT WINDOW - Expect ice-out this week on shallow lakes (Lester River, Pike Lake). Deeper lakes (Coe, Island) likely next week.';
+                    seasonPhase = 'Ice-Out Transition';
+                    seasonRating = 3;
+                    waterTempRange = '38-45°F (newly open water)';
+                    techniques = 'UNSAFE ice fishing. Wait for confirmed ice-out. First open water: slow jerkbaits, suspending jigs on main lake points 5-10ft.';
+                    specificAdvice = 'Monitor MN DNR reports for ice-out confirmation. Water is VERY cold - bass lethargic. Pike and walleye more active. Safety first - ice may look solid but is rotting.';
+                } else {
+                    iceOutStatus = 'POST ICE-OUT - Most area lakes open. Early pre-spawn staging.';
+                    seasonPhase = 'Early Pre-Spawn';
+                    seasonRating = 4;
+                    waterTempRange = '45-52°F';
+                    techniques = 'Jerkbaits (suspending), slow rolling spinnerbaits, jigs on main lake points and first breaks adjacent to spawning bays.';
+                    specificAdvice = 'Bass moving from deep winter areas (15-25ft) toward spawning flats. Target transition zones. Fish SLOW - cold water metabolism. Best: sunny afternoons 2-5pm when water warms.';
+                }
+            } else if (month === 4) { // May
+                if (day < 15) {
+                    iceOutStatus = 'Ice-out complete. Water warming rapidly.';
+                    seasonPhase = 'Pre-Spawn Peak';
+                    seasonRating = 5;
+                    waterTempRange = '52-60°F';
+                    techniques = 'Spinnerbaits (white/chartreuse), chatterbaits, swimbaits. Target shallow bays 3-8ft with dark bottom - absorbs heat fastest.';
+                    specificAdvice = 'PRIME TIME. Bass staging in 5-10ft near spawning flats. Aggressive feeding before spawn. Focus on north-facing bays (warm first). Best: 10am-4pm as water warms.';
+                } else if (day >= 15 && day < 25) {
+                    iceOutStatus = 'Spawn initiated on warmest lakes.';
+                    seasonPhase = 'Spawn Period';
+                    seasonRating = 3;
+                    waterTempRange = '60-68°F';
+                    techniques = 'Sight fishing with tubes, creature baits, ned rigs. CATCH AND RELEASE ONLY - bass on beds.';
+                    specificAdvice = 'Males guarding beds in 2-6ft near cover. Females nearby in 8-12ft. Minimize fight time and handling. Post-spawn bass recover in 10-15ft on first structure off flats.';
+                } else {
+                    iceOutStatus = 'Post-spawn transition.';
+                    seasonPhase = 'Post-Spawn';
+                    seasonRating = 4;
+                    waterTempRange = '65-72°F';
+                    techniques = 'Topwater (dawn/dusk), Texas rigs on emerging weeds, drop shot on breaks.';
+                    specificAdvice = 'Bass recovering adjacent to spawning areas. Males still protecting fry. Target first deep weed edge or rock structure 8-15ft. Females feeding heavily to recover.';
+                }
+            } else if (month >= 5 && month <= 7) { // June-August
+                iceOutStatus = 'Summer pattern established.';
+                seasonPhase = 'Summer Deep Structure';
+                seasonRating = 4;
+                waterTempRange = '70-78°F';
+                techniques = 'Deep cranks, Carolina rigs, jigs on weed edges 12-20ft. Topwater at low light.';
+                specificAdvice = 'Thermocline formed. Bass on deep weed edges, rock humps, points. Best: dawn (5-8am) and dusk (6-9pm). Midday = go deep or quit.';
+            } else if (month >= 8 && month <= 9) { // September-October
+                iceOutStatus = 'Fall turnover period.';
+                seasonPhase = 'Fall Feeding Binge';
+                seasonRating = 5;
+                waterTempRange = '55-68°F';
+                techniques = 'Crankbaits, jerkbaits, swimbaits - MATCH THE BAITFISH SIZE. Cover water fast.';
+                specificAdvice = 'Bass feeding aggressively before winter. Target transition zones 8-18ft. Perch and shad patterns. All-day bite possible. Water cooling = increasing activity.';
+            } else { // November-March
+                iceOutStatus = 'Ice fishing season.';
+                seasonPhase = 'Hard Water';
+                seasonRating = 2;
+                waterTempRange = '33-39°F';
+                techniques = 'Ice jigs, tip-ups with shiners. Target 12-25ft near rocky structure for smallmouth.';
+                specificAdvice = 'Largemouth very lethargic. Smallmouth more active on rock. Pike and panfish primary targets. Safe ice = 4"+ clear or 6"+ white.';
+            }
+            
+            // Time of day analysis - SPECIFIC
+            let timeRating = 3;
+            let timeAdvice = '';
+            if (hour >= 5 && hour < 9) {
+                timeRating = 5;
+                timeAdvice = 'PRIME DAWN WINDOW. Bass feeding actively. Topwater and fast-moving baits excel. Water coolest now - fish may be slightly deeper than midday.';
+            } else if (hour >= 9 && hour < 12) {
+                timeRating = 4;
+                timeAdvice = 'Morning action continuing. As water warms, bass move shallower (spring) or deeper (summer). Good time for search baits.';
+            } else if (hour >= 12 && hour < 16) {
+                if (month >= 5 && month <= 8) {
+                    timeRating = 2;
+                    timeAdvice = 'Summer midday slowdown. Bass deep on structure or in shade. Switch to finesse. Deep weed edges, docks, overhangs.';
+                } else {
+                    timeRating = 3;
+                    timeAdvice = 'Midday warming (spring/fall). Bass may move shallow to feed as water temp peaks for the day. Sunny banks and dark bottoms.';
+                }
+            } else if (hour >= 16 && hour < 21) {
+                timeRating = 5;
+                timeAdvice = 'PRIME EVENING WINDOW. Bass moving shallow to feed. Excellent topwater opportunities. Low light = aggressive strikes. Extended feeding window in summer (light til 9pm).';
+            } else {
+                timeRating = 4;
+                timeAdvice = 'Night fishing. Trophy largemouth potential. Dark lures, slow retrieves. Focus on shallow cover - docks, weeds, laydowns. Smallmouth less active at night.';
+            }
+            
+            // Moon phase and solunar
+            const moonPhase = getMoonPhase(now);
+            const solunar = getSolunarPeriods(now);
+            
+            // Overall rating
+            const overallRating = Math.round((seasonRating + moonPhase.rating + timeRating) / 3);
+            
+            const ratingText = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+            const ratingColor = ['#ef4444', '#f59e0b', '#fcd34d', '#6ee7b7', '#34d399'];
+            
+            const html = `
+                <div style="background: var(--bg-card); padding: 24px; border-radius: 16px; border: 1px solid var(--border);">
+                    <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(52, 211, 153, 0.1)); border-radius: 12px; margin-bottom: 24px;">
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Today's Fishing Forecast</div>
+                        <div style="font-size: 16px; color: var(--text-primary); margin-bottom: 16px; font-weight: 600;">${dateStr}</div>
+                        <div style="font-size: 72px; font-weight: 700; margin-bottom: 8px; line-height: 1;">${overallRating}/5</div>
+                        <div style="font-size: 32px; font-weight: 700; color: ${ratingColor[overallRating - 1]}; margin-bottom: 8px;">${ratingText[overallRating - 1]}</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Minnesota Bass Conditions</div>
+                    </div>
+                    
+                    <div style="background: rgba(239, 68, 68, 0.1); padding: 16px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #ef4444;">
+                        <div style="font-weight: 700; font-size: 15px; color: #fca5a5; margin-bottom: 8px;">🧊 ICE STATUS - DULUTH AREA</div>
+                        <div style="font-size: 14px; color: var(--text-primary); line-height: 1.6;">${iceOutStatus}</div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 18px; border-radius: 12px; margin-bottom: 16px; border-left: 4px solid var(--accent);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="font-weight: 700; font-size: 16px; color: var(--text-primary);">📅 ${seasonPhase}</div>
+                            <div style="font-size: 20px; font-weight: 700; color: ${ratingColor[seasonRating - 1]};">${seasonRating}/5</div>
+                        </div>
+                        <div style="background: rgba(56, 189, 248, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600;">CURRENT WATER TEMPS</div>
+                            <div style="font-size: 16px; font-weight: 700; color: var(--accent-light);">${waterTempRange}</div>
+                        </div>
+                        <div style="background: rgba(52, 211, 153, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600;">PRIMARY TECHNIQUES TODAY</div>
+                            <div style="font-size: 14px; color: var(--text-primary); line-height: 1.5;">${techniques}</div>
+                        </div>
+                        <div style="background: rgba(251, 191, 36, 0.1); padding: 12px; border-radius: 8px;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600;">⚡ TACTICAL ANALYSIS</div>
+                            <div style="font-size: 14px; color: var(--text-primary); line-height: 1.6;">${specificAdvice}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 18px; border-radius: 12px; margin-bottom: 16px; border-left: 4px solid #ffd700;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="font-weight: 700; font-size: 16px; color: var(--text-primary);">🌙 ${moonPhase.name}</div>
+                            <div style="font-size: 20px; font-weight: 700; color: ${ratingColor[moonPhase.rating - 1]};">${moonPhase.rating}/5</div>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6;">
+                            ${moonPhase.illumination}% illuminated • ${moonPhase.rating >= 4 ? 'Major feeding period - bass actively hunting' : moonPhase.rating >= 3 ? 'Moderate activity - fish high-percentage spots' : 'Minor phase - focus on structure and proven patterns'}
+                        </div>
+                        <div style="background: rgba(255, 215, 0, 0.1); padding: 12px; border-radius: 6px;">
+                            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; font-weight: 600;">Solunar Feeding Windows (${dateStr.split(',')[0]})</div>
+                            <div style="display: grid; gap: 6px; font-size: 13px;">
+                                <div style="display: flex; justify-content: space-between; padding: 8px; background: rgba(52, 211, 153, 0.15); border-radius: 4px;">
+                                    <span style="color: var(--success); font-weight: 700;">Major 1</span>
+                                    <span style="color: var(--text-primary);">${solunar.major1.start} - ${solunar.major1.end}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px; background: rgba(52, 211, 153, 0.15); border-radius: 4px;">
+                                    <span style="color: var(--success); font-weight: 700;">Major 2</span>
+                                    <span style="color: var(--text-primary);">${solunar.major2.start} - ${solunar.major2.end}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 6px; background: rgba(56, 189, 248, 0.1); border-radius: 4px;">
+                                    <span style="color: var(--accent-light);">Minor 1</span>
+                                    <span style="color: var(--text-secondary); font-size: 12px;">${solunar.minor1.start} - ${solunar.minor1.end}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 6px; background: rgba(56, 189, 248, 0.1); border-radius: 4px;">
+                                    <span style="color: var(--accent-light);">Minor 2</span>
+                                    <span style="color: var(--text-secondary); font-size: 12px;">${solunar.minor2.start} - ${solunar.minor2.end}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 18px; border-radius: 12px; margin-bottom: 16px; border-left: 4px solid #ff6b6b;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="font-weight: 700; font-size: 16px; color: var(--text-primary);">⏰ Right Now (${hour > 12 ? hour - 12 : hour}:00 ${hour >= 12 ? 'PM' : 'AM'})</div>
+                            <div style="font-size: 20px; font-weight: 700; color: ${ratingColor[timeRating - 1]};">${timeRating}/5</div>
+                        </div>
+                        <div style="font-size: 14px; color: var(--text-primary); line-height: 1.7;">${timeAdvice}</div>
+                    </div>
+                    
+                    <div style="background: rgba(56, 189, 248, 0.05); padding: 16px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.2);">
+                        <div style="font-size: 11px; font-weight: 700; color: var(--accent-light); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Data Sources & Verification</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                            <div style="margin-bottom: 6px;">📍 <strong>Location:</strong> Duluth, MN area (46.79°N, 92.10°W)</div>
+                            <div style="margin-bottom: 6px;">🧊 <strong>Ice-out data:</strong> Historical averages from MN DNR (typical: April 20-May 5 for area lakes)</div>
+                            <div style="margin-bottom: 6px;">🌡️ <strong>Water temps:</strong> Estimated based on current calendar date and typical MN stratification</div>
+                            <div style="margin-bottom: 6px;">🌙 <strong>Moon/Solunar:</strong> Calculated astronomically for ${dateStr}</div>
+                            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                                <strong>⚠️ Verify before fishing:</strong><br>
+                                • MN DNR LakeFinder for lake-specific ice-out reports<br>
+                                • Local bait shops for current bite conditions<br>
+                                • NOAA for today's pressure and weather<br>
+                                • Check ice thickness personally - NEVER trust reports alone
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('forecastContent').innerHTML = html;
+        }
+            
+        function getSolunarPeriods(date) {
+            const d = new Date(date);
+            const moonAge = (d.getTime() / 86400000) % 29.530588853;
+            const lunarNoon = (moonAge / 29.530588853) * 24;
+            
+            const major1Start = (lunarNoon - 1 + 24) % 24;
+            const major1End = (lunarNoon + 1) % 24;
+            const major2Start = ((lunarNoon + 12 - 1) % 24);
+            const major2End = ((lunarNoon + 12 + 1) % 24);
+            
+            const minor1Start = ((lunarNoon - 6 - 0.5 + 24) % 24);
+            const minor1End = ((lunarNoon - 6 + 0.5 + 24) % 24);
+            const minor2Start = ((lunarNoon + 6 - 0.5) % 24);
+            const minor2End = ((lunarNoon + 6 + 0.5) % 24);
+            
+            function formatTime(hours) {
+                const h = Math.floor(hours);
+                const m = Math.floor((hours - h) * 60);
+                const period = h >= 12 ? 'PM' : 'AM';
+                const displayHour = h % 12 || 12;
+                return `${displayHour}:${m.toString().padStart(2, '0')}${period}`;
+            }
+            
+            return {
+                major1: { start: formatTime(major1Start), end: formatTime(major1End) },
+                major2: { start: formatTime(major2Start), end: formatTime(major2End) },
+                minor1: { start: formatTime(minor1Start), end: formatTime(minor1End) },
+                minor2: { start: formatTime(minor2Start), end: formatTime(minor2End) }
+            };
+        }
+        
+        // Render History
+        function renderHistory() {
+            if (catches.length === 0) {
+                document.getElementById('historyContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">No catches yet</div>';
+                return;
+            }
+            
+            const sorted = [...catches].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const html = sorted.map(c => {
+                let photosHtml = '';
+                if (c.photos && c.photos.length > 0) {
+                    const photoImgs = c.photos.map(p => `<img src="${p}" onclick="showPhotoModal('${p}')" style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px; cursor: pointer;">`).join('');
+                    photosHtml = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-bottom: 12px;">${photoImgs}</div>`;
+                }
+                
+                const fishName = c.fishName || 'Unnamed Fish';
+                const weightText = c.weight ? `• ${c.weight} lbs` : '';
+                const timeText = c.time ? `@ ${c.time}` : '';
+                const lureHtml = c.lure ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">🎣 ${c.lure}</div>` : '';
+                
+                let conditionHtml = '';
+                if (c.conditionFactor) {
+                    const ageText = c.estimatedAge ? ` • Age: ${c.estimatedAge} yrs` : '';
+                    conditionHtml = `<div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">K: ${c.conditionFactor}${ageText}</div>`;
+                }
+                
+                return `
+                    <div style="background: var(--bg-card); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px;">
+                        ${photosHtml}
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
+                            <div>
+                                <div style="font-weight: 700; font-size: 16px;">${c.species} ${c.isTrophy ? '🏆' : ''}</div>
+                                <div style="font-size: 14px; color: var(--accent-light); margin-top: 2px; cursor: pointer;" onclick="editFishName(${c.id})" title="Click to edit name">
+                                    🐟 <span id="fishName-${c.id}">${fishName}</span> ✏️
+                                </div>
+                            </div>
+                        </div>
+                        <div style="color: var(--accent-light); margin-bottom: 8px;">${c.length}" ${weightText}</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            📍 ${c.location} • 📅 ${c.date} ${timeText}
+                        </div>
+                        ${lureHtml}
+                        ${conditionHtml}
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('historyContent').innerHTML = html;
+        }
+        
+        function editFishName(catchId) {
+            const catchData = catches.find(c => c.id === catchId);
+            if (!catchData) return;
+            
+            const currentName = catchData.fishName || 'Unnamed Fish';
+            const newName = prompt('Edit fish name:', currentName);
+            
+            if (newName && newName.trim()) {
+                catchData.fishName = newName.trim();
+                localStorage.setItem('catches', JSON.stringify(catches));
+                document.getElementById(`fishName-${catchId}`).textContent = newName.trim();
+            }
+        }
+        
+        function showPhotoModal(src) {
+            document.getElementById('photoModalImg').src = src;
+            document.getElementById('photoModal').style.display = 'block';
+        }
+        
+        // AI Chat
+        function sendAIMessage() {
+            const input = document.getElementById('chatInput');
+            const question = input.value.trim();
+            if (!question) return;
+            
+            const chatDiv = document.getElementById('chatMessages');
+            chatDiv.innerHTML += `
+                <div style="margin-bottom: 12px; text-align: right;">
+                    <div style="display: inline-block; background: var(--accent); color: var(--bg-primary); padding: 10px 14px; border-radius: 10px; max-width: 80%; text-align: left;">${question}</div>
+                </div>
+            `;
+            
+            input.value = '';
+            
+            let answer = "Ask about bass lures, water temps, or fishing times!";
+            const q = question.toLowerCase();
+            
+            // DAY ASSESSMENT
+            if (q.includes('how') && (q.includes('day') || q.includes('today')) || q.includes('should i fish') || q.includes('conditions')) {
+                const now = new Date();
+                const month = now.getMonth();
+                const day = now.getDate();
+                const hour = now.getHours();
+                const moonPhase = getMoonPhase(now);
+                
+                let dayRating = 3;
+                let timeRating = 3;
+                let seasonRating = 3;
+                let recommendation = '';
+                
+                // Time of day rating
+                if ((hour >= 5 && hour < 9) || (hour >= 17 && hour < 21)) {
+                    timeRating = 5;
+                    recommendation = 'RIGHT NOW is PRIME TIME (dawn/dusk window)! Get out there!';
+                } else if (hour >= 9 && hour < 12) {
+                    timeRating = 4;
+                    recommendation = 'Good morning window still open. Fish the next 1-2 hours.';
+                } else if (hour >= 12 && hour < 16) {
+                    if (month >= 5 && month <= 8) {
+                        timeRating = 2;
+                        recommendation = 'Summer midday slowdown. Go deep or wait for evening (5pm+).';
+                    } else {
+                        timeRating = 3;
+                        recommendation = 'Midday - fishable in spring/fall. Target sunny banks.';
+                    }
+                } else if (hour >= 16 && hour < 17) {
+                    timeRating = 4;
+                    recommendation = 'Bass starting to move for evening feed. Good time to start.';
+                } else {
+                    timeRating = 4;
+                    recommendation = 'Night fishing - trophy largemouth potential with dark lures.';
+                }
+                
+                // Season rating (April 12)
+                if (month === 3) { // April
+                    if (day < 20) {
+                        seasonRating = 2;
+                        recommendation += ' STILL ICE COVERED - Most Duluth lakes frozen. Ice fishing only.';
+                    } else if (day >= 20 && day < 28) {
+                        seasonRating = 3;
+                        recommendation += ' ICE-OUT WINDOW - Check MN DNR for lake status.';
+                    } else {
+                        seasonRating = 4;
+                        recommendation += ' Early pre-spawn - bass moving shallow.';
+                    }
+                } else if (month === 4 && day < 15) {
+                    seasonRating = 5;
+                    recommendation += ' PRIME PRE-SPAWN SEASON - May is best month!';
+                } else if (month >= 5 && month <= 7) {
+                    seasonRating = 4;
+                    recommendation += ' Summer pattern - dawn/dusk best.';
+                } else if (month >= 8 && month <= 9) {
+                    seasonRating = 5;
+                    recommendation += ' FALL FEEDING FRENZY - all-day bite possible!';
+                }
+                
+                // Overall
+                dayRating = Math.round((timeRating + seasonRating + moonPhase.rating) / 3);
+                
+                const ratingText = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+                
+                answer = `**TODAY'S FISHING ASSESSMENT:**\n\n📊 **Overall: ${dayRating}/5 - ${ratingText[dayRating - 1]}**\n\n⏰ **Time Rating: ${timeRating}/5**\n${recommendation}\n\n📅 **Season: ${seasonRating}/5**\n🌙 **Moon: ${moonPhase.rating}/5** (${moonPhase.name})\n\n**BOTTOM LINE:** ${dayRating >= 4 ? 'GO FISH! Conditions are favorable.' : dayRating === 3 ? 'Decent conditions - worth a shot.' : 'Tough conditions but still possible with right approach.'}\n\nAsk: "what lures?" • "where to fish?" • "what technique?"`;
+            }
+            
+            // LURE SELECTION - DETAILED
+            else if (q.includes('lure') || q.includes('bait') || q.includes('what to throw') || q.includes('what should i use')) {
+                const now = new Date();
+                const month = now.getMonth();
+                const day = now.getDate();
+                const hour = now.getHours();
+                
+                let lureAdvice = '';
+                
+                // Current season (April 12 = still ice)
+                if (month === 3 && day < 20) {
+                    lureAdvice = "**ICE FISHING LURES (April 12):**\n\n❄️ **Still ice season - no open water bass**\n\n**For Pike/Panfish:**\n• Tip-ups with shiners (pike)\n• Jigs tipped with waxworms (panfish)\n• Small spoons (perch)\n\n**Bass:** Very inactive in 33-36°F under ice. Target pike/panfish instead.\n\n**WAIT FOR ICE-OUT** (April 20-May 5) for bass fishing.";
+                } else if (month === 3 && day >= 20 || (month === 4 && day < 15)) { // Pre-spawn
+                    lureAdvice = "**PRE-SPAWN LURES** (Late April/Early May):\n\n**Water temp: 45-60°F**\n\n🎣 **TOP PRODUCERS:**\n\n**JERKBAITS** (suspending)\n• Rapala X-Rap, Megabass Vision 110\n• Cadence: Twitch-twitch-PAUSE (5-10 sec)\n• Colors: Chrome/blue (clear), chartreuse/white (stained)\n• KVD: 'Catch bass in 40°F water on jerkbaits'\n\n**SPINNERBAITS**\n• White/chartreuse with Colorado blades\n• SLOW ROLL 3-8ft deep\n• Target main lake points\n\n**JIGS**\n• 3/8-1/2oz with craw trailer\n• Green pumpkin, black/blue\n• Slow presentations\n\n**CHATTERBAITS**\n• White/shad patterns\n• Cover water to locate fish\n\n**KEY:** FISH SLOW. Cold water = slow metabolism.";
+                } else if ((month === 4 && day >= 15) || month === 5) { // Spawn
+                    lureAdvice = "**SPAWN LURES:**\n\n**Water temp: 60-70°F**\n\n⚠️ **CATCH & RELEASE CRITICAL**\n\n**SIGHT FISHING:**\n• Tubes (green pumpkin)\n• Creature baits (Texas rig)\n• Ned rigs (finesse)\n• Wacky rig Senko\n\n**AGGRESSIVE FEEDERS:**\n• Spinnerbaits (white)\n• Chatterbaits\n• Squarebill cranks\n\n**Minimize fight time and handling!**";
+                } else if (month >= 5 && month <= 7) { // Summer
+                    if (hour >= 5 && hour < 9 || hour >= 17 && hour < 21) {
+                        lureAdvice = "**SUMMER - DAWN/DUSK LURES:**\n\n🌅 **TOPWATER TIME!**\n\n**WALKING BAITS**\n• Zara Spook, Sammy\n• Walk the dog retrieve\n• White, bone, chrome\n\n**POPPERS**\n• Pop-R, Chug Bug\n• Pop-pause-pop\n• PAUSE after splash\n\n**BUZZBAITS**\n• White/chartreuse\n• Constant retrieve\n• Over shallow cover\n\n**SHALLOW CRANKS**\n• Squarebills 2-5ft\n• Natural colors\n• Over weed edges\n\n**SPINNERBAITS**\n• Burn just under surface\n• White/chartreuse";
+                    } else {
+                        lureAdvice = "**SUMMER - MIDDAY DEEP LURES:**\n\n🌊 **GO DEEP (12-25ft):**\n\n**TEXAS RIG**\n• Senko (weightless) - most versatile\n• Creature baits (1/4-3/8oz)\n• Green pumpkin, black/blue\n• Let fall on slack line\n\n**DROP SHOT**\n• Finesse worms 4-6\"\n• Vertical on points\n• 12-18\" leader\n\n**CAROLINA RIG**\n• Creature baits\n• 3/4oz weight, 18-24\" leader\n• Drag deep structure\n\n**DEEP CRANKS**\n• 10-15ft+ divers\n• Follow weed edge depth\n\n**FOOTBALL JIGS**\n• 1/2-3/4oz\n• Drag on rock 15-25ft";
+                    }
+                } else if (month >= 8 && month <= 9) { // Fall
+                    lureAdvice = "**FALL LURES** (Feeding Frenzy):\n\n🍂 **MATCH THE BAITFISH SIZE**\n\n**CRANKBAITS** (primary)\n• Medium/deep divers\n• Perch, shad, bluegill patterns\n• COVER WATER FAST\n• Square bills shallow, deep divers 10-15ft\n\n**JERKBAITS**\n• 4-5\" suspending\n• AGGRESSIVE cadence (not lethargic)\n• Silver/chrome, shad\n\n**SWIMBAITS**\n• 4-6\" paddletails\n• Dying baitfish imitation\n• White, pearl\n\n**LIPLESS CRANKS**\n• Red Eye Shad\n• 1/2-3/4oz\n• Rip through grass\n\n**CHATTERBAITS**\n• BURN retrieve\n• White/shad\n\n**Fall = SPEED UP vs spring**";
+                } else { // Winter
+                    lureAdvice = "**WINTER/ICE LURES:**\n\n❄️ **Ice fishing season**\n\n• Tip-ups with shiners (pike)\n• Jigs (panfish)\n• Small spoons\n\n**Bass:** Very deep, inactive. Target other species.";
+                }
+                
+                answer = lureAdvice;
+            }
+            
+            // WHERE TO FISH - DETAILED
+            else if (q.includes('where') || q.includes('location') || q.includes('structure') || q.includes('find bass')) {
+                const now = new Date();
+                const month = now.getMonth();
+                const day = now.getDate();
+                const hour = now.getHours();
+                
+                let whereAdvice = '';
+                
+                if (month === 3 && day < 20) { // April, pre ice-out
+                    whereAdvice = "**ICE FISHING LOCATIONS (April 12):**\n\n🧊 **STILL ON ICE** - Most Duluth-area lakes frozen\n\n**NOT BASS SEASON** - Ice fishing only\n\n**FOR PIKE/PANFISH:**\n\n**STRUCTURE:**\n• 8-15ft near drop-offs\n• Remaining weed edges\n• Main lake points\n• Rocky transitions\n• Basin edges\n\n**SPECIES:**\n• Northern pike (tip-ups, 10-20ft)\n• Bluegill (small jigs, 8-12ft)\n• Crappie (8-15ft near structure)\n• Perch (12-20ft, rocky areas)\n\n⚠️ **LATE ICE = DANGEROUS**\n• Check thickness PERSONALLY\n• 4\"+ clear ice minimum\n• Avoid pressure cracks, dark spots\n• Ice rots from bottom up\n\n**ICE-OUT:** Typically April 20-May 5\n\nCheck: **MN DNR LakeFinder** for reports";
+                } else if (month === 3 && day >= 20 && day < 28) { // Ice-out transition
+                    whereAdvice = "**ICE-OUT TRANSITION (April 20-27):**\n\n⚠️ **Check MN DNR LakeFinder for confirmed ice-out**\n\n**IF ICE IS OUT:**\n\n📍 **MAIN LAKE POINTS** (8-15ft)\n• First structure with deep water access\n• Bass staging before moving shallow\n• Rocky points ideal\n• Target: Transition zones\n\n📍 **FIRST BREAKS/LEDGES**\n• Adjacent to spawning bays\n• 8-12ft depth\n• Where deep meets shallow\n\n📍 **PROTECTED BAYS** (starting to warm)\n• North-facing (sun exposure)\n• Dark bottom areas\n• Still relatively deep (6-10ft)\n\n**Water temp: 38-48°F**\n**Bass: Lethargic but present**\n**AVOID:** Unsafe ice, very shallow water (too cold)\n\n**Pike/walleye more active than bass**";
+                } else if ((month === 3 && day >= 28) || (month === 4 && day < 15)) { // Pre-spawn
+                    whereAdvice = "**PRE-SPAWN LOCATIONS** (Late April/Early May):\n\n🎯 **80/20 RULE:** 80% of bass in 20% of lake\n\n**STAGING AREAS** (8-15ft):\n• Main lake points adjacent to spawning bays\n• First breaks/ledges\n• Transition zones (deep to shallow)\n• Outside edges of flats\n\n**FEEDING ZONES** (3-8ft):\n\n🌡️ **WARMEST WATER FIRST:**\n• **North-facing bays** (sun exposure)\n• **Dark bottom areas** (gravel, mud absorb heat)\n• Protected coves\n• Shallow flats NEAR deep water (escape route)\n\n**STRUCTURE TO TARGET:**\n• **Wood:** Laydowns, stumps, logs\n• **First emerging weeds:** New growth\n• **Rocky points:** Hard bottom\n• **Gravel transitions:** Spawning prep\n\n**DEPTH PATTERN:**\n• Early morning: 8-15ft (staging)\n• As sun warms: 3-8ft (feeding)\n• Cold front: Back to 10-15ft\n\n**KEY:** Bass moving from winter deep (15-25ft) toward spawning flats (2-6ft). Find the TRANSITION.";
+                } else if ((month === 4 && day >= 15) || month === 5) { // Spawn
+                    whereAdvice = "**SPAWN LOCATIONS:**\n\n🐟 **SPAWNING AREAS** (2-6ft):\n\n**REQUIREMENTS:**\n• Shallow water (2-6ft)\n• Hard bottom (gravel, sand, clay)\n• Protected from wind/current\n• Near cover (wood, weeds)\n• Sunlight penetration (egg development)\n\n**WHERE TO LOOK:**\n• Back of protected coves\n• Shallow bays\n• Canal/creek arms\n• Inside turns\n• Pockets in vegetation\n\n**VISUAL CUES:**\n• Light-colored circular beds\n• Clear bottom (swept clean)\n• Males guarding (dark coloration)\n• Females nearby 8-12ft\n\n⚠️ **CATCH & RELEASE CRITICAL**\n• Minimize fight time\n• Don't remove from water\n• Quick photo, quick release\n\n**POST-SPAWN** (Late May):\n• First cover off spawning flats\n• Docks 6-15ft\n• Weed lines developing\n• Points adjacent to bays\n• Females recovering, feeding heavily";
+                } else if (month >= 5 && month <= 7) { // Summer
+                    if (hour >= 5 && hour < 9 || hour >= 17 && hour < 21) {
+                        whereAdvice = "**SUMMER DAWN/DUSK LOCATIONS:**\n\n🌅 **SHALLOW FEEDING ZONES (3-8ft):**\n\n**WEED EDGES** (inside edge)\n• Where weeds meet open water\n• Pockets and points in weeds\n• Isolated weed clumps\n\n**SHORELINE COVER:**\n• Laydowns extending to deep\n• Docks (corners, posts)\n• Overhanging trees\n• Rock banks\n• Lily pads\n\n**POINTS**\n• Main lake points\n• Secondary points in bays\n• Fish all sides\n\n**PATTERNS:**\n• Bass move shallow to feed\n• Target edges and transitions\n• Active, aggressive fish\n\n**MN Advantage:** Light until 9pm = extended evening window!";
+                    } else {
+                        whereAdvice = "**SUMMER MIDDAY LOCATIONS:**\n\n🌊 **GO DEEP (12-25ft):**\n\n**THERMOCLINE DEPTH** (typically 12-18ft MN)\n• Find weed depth = thermocline\n• Bass suspend at this level\n• Oxygen layer\n\n**DEEP WEED EDGES** (outside edge)\n• At thermocline depth\n• Where weeds end\n• Drop-offs\n\n**ROCK STRUCTURE:**\n• Humps 15-25ft\n• Points extending deep\n• Boulder fields\n• Ledges\n\n**SHADE:**\n• Deep docks\n• Boat houses\n• Overhanging cliffs\n\n**LAYDOWNS** (in deeper water)\n• 10-20ft depth\n• Trunk to branches\n\n**CREEK CHANNELS**\n• Submerged river beds\n• 15-25ft\n\n**Summer midday = LOCATION matters most. Find the depth, THEN fish it.**";
+                    }
+                } else if (month >= 8 && month <= 9) { // Fall
+                    whereAdvice = "**FALL LOCATIONS** (Feeding Frenzy):\n\n🍂 **TRANSITION ZONES (8-18ft):**\n\n**WHERE SHALLOW MEETS DEEP:**\n• Points extending from bays\n• Creek channel edges\n• Ledges and drop-offs\n• Humps with depth change\n• Main lake structure\n\n**FOLLOW BAITFISH:**\n• **Birds diving** = baitfish schools = bass\n• Open water suspended bass\n• Shallow flats with shad\n• Creek mouths (baitfish staging)\n\n**STRUCTURE:**\n• Rocky points\n• Weed edges (dying weeds)\n• Timber/brush\n• Docks\n\n**PATTERN:**\n• Bass are ROAMING (not stationary)\n• Cover LARGE AREAS fast\n• Not structure-specific like summer\n• Following food = following baitfish\n\n**All-day bite possible** - not just dawn/dusk\n\n**Trophy potential:** Bass heavy with fat for winter";
+                } else { // Winter
+                    whereAdvice = "**WINTER/ICE LOCATIONS:**\n\n❄️ **DEEP BASINS (20-30ft):**\n• Main lake deep holes\n• River/creek channels\n• Deep points\n\n**STRUCTURE:**\n• Rocky points (smallmouth)\n• Edges of remaining weeds\n• Deep transitions\n\n**BASS:** Very lethargic, deep, inactive\n\n**Better targets:** Pike, panfish, walleye";
+                }
+                
+                answer = whereAdvice;
+            }
+            
+            // TECHNIQUE/HOW TO
+            else if (q.includes('technique') || q.includes('how to') || q.includes('retrieve') || q.includes('presentation')) {
+                answer = "**BASS TECHNIQUES:**\n\n**JERKBAIT:**\n• Twitch-twitch-PAUSE\n• Cold: 5-10 sec pause\n• Warm: 1-3 sec pause\n• Vary cadence\n\n**SPINNERBAIT:**\n• Slow roll (maintain depth)\n• Burn (fast, surface)\n• Helicopter (fall on slack)\n\n**TEXAS RIG:**\n• Pitch to cover\n• Let fall on slack line\n• WATCH LINE for bite\n• Hop along bottom\n\n**TOPWATER:**\n• Walk the dog (rhythmic)\n• Pop-pause-pop\n• **PAUSE after splash**\n• Don't set on explosion - wait for weight\n\n**WACKY RIG:**\n• Hook through middle\n• Cast, let fall\n• Twitch occasionally\n• EASIEST for beginners\n\n**KEY:** Match speed to water temp. Cold = SLOW, Warm = FASTER";
+            }
+            
+            // WATER TEMP
+            else if (q.includes('temp')) {
+                answer = "**WATER TEMPERATURE GUIDE:**\n\n**Under 45°F:** Bass lethargic, deep 15-25ft. SLOW presentations. Jerkbaits work (KVD catches bass in 40°F!).\n\n**45-55°F:** Pre-spawn staging. Bass moving shallow. Moderate activity. Spinnerbaits, jigs 8-15ft.\n\n**55-65°F:** PRIME! Feeding heavily before spawn. Aggressive. Spinnerbaits, chatterbaits, swimbaits 3-8ft.\n\n**60-75°F:** OPTIMAL. Peak metabolism. All techniques work. Most active.\n\n**70-80°F:** Summer. Dawn/dusk shallow (topwater), midday DEEP (12-25ft).\n\n**80°F+:** Very warm. Early/late only shallow. Deep structure primary.\n\n**Kevin VanDam:** 'Water temp overrated - photoperiod (day length) matters MORE. Bass spawn 55-80°F range, not one temp.'";
+            }
+            
+            // TIME OF DAY
+            else if (q.includes('time') || q.includes('when')) {
+                answer = "**TIME OF DAY:**\n\n**DAWN (5-9am) - PRIME:**\n• LOW LIGHT = aggressive\n• Topwater, spinnerbaits\n• Shallow 3-8ft\n• Best: First hour of light\n\n**DUSK (5-9pm) - PRIME:**\n• Equal to dawn (maybe better)\n• Topwater excellence\n• Bass move shallow\n• MN: Light until 9pm summer!\n\n**MIDDAY:**\n• Summer: GO DEEP or quit\n• Spring/Fall: Still fishable\n• Target sunny banks (warm)\n\n**NIGHT:**\n• Largemouth: Trophy potential\n• BLACK lures (silhouette)\n• Shallow cover 2-8ft\n• Smallmouth: Less active";
+            }
+            
+            // PRESSURE
+            else if (q.includes('pressure') || q.includes('weather') || q.includes('front')) {
+                answer = "**BAROMETRIC PRESSURE:**\n\n**FALLING (BEST):**\n• Pre-storm feeding frenzy\n• AGGRESSIVE fishing\n• Upsize lures, fast retrieves\n• Buzzbaits, chatterbaits\n• Pros: 'Best time to fish'\n\n**STABLE (GOOD):**\n• Normal patterns\n• Food chain rhythm\n• Predictable bass\n\n**RISING (TOUGH):**\n• Post-storm\n• Bass less active, deeper\n• DOWNSIZE, slow down\n• Finesse tactics\n• 1-2 days to adjust\n\n**HIGH (SLOW):**\n• Bluebird skies = worst\n• Tight to cover\n• Drop shot, ned rig only\n\n**Normal: 29.70-30.40 inHg**";
+            }
+            
+            // DEFAULT
+            else {
+                answer = "**ASK ME ABOUT:**\n\n📊 **\"How's the day?\"** - Real-time conditions\n🎣 **\"What lures?\"** - Season-specific\n📍 **\"Where to fish?\"** - Locations by date\n🎯 **\"What technique?\"** - How to fish\n🌡️ **\"Water temp?\"** - Temp effects\n⏰ **\"Best time?\"** - Dawn/dusk/night\n📊 **\"Pressure?\"** - Weather effects\n\nI'm programmed with verified bass fishing knowledge for Minnesota conditions!";
+            }
+            
+            setTimeout(() => {
+                chatDiv.innerHTML += `
+                    <div style="margin-bottom: 12px;">
+                        <div style="display: inline-block; background: var(--bg-card); border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px; max-width: 90%;">
+                            <div style="font-size: 10px; font-weight: 700; color: var(--accent-light); margin-bottom: 6px;">BASS AI GUIDE</div>
+                            <div style="font-size: 14px; white-space: pre-line; line-height: 1.6;">${answer}</div>
+                        </div>
+                    </div>
+                `;
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            }, 500);
+        }
+        
+        // CSV Export
+        function exportToCSV() {
+            if (catches.length === 0) return alert('No catches to export!');
+            
+            const headers = ['Date', 'Time', 'Species', 'Length', 'Weight', 'Location', 'Lure', 'Water Temp', 'Air Temp', 'Pressure', 'Pressure Trend', 'Wind Speed', 'Wind Dir', 'Sky', 'Clarity', 'Fight Time', 'Depth', 'Structure', 'Release', 'K-Factor', 'Moon Phase', 'Age', 'Time of Day', 'Trophy', 'Notes'];
+            
+            let csv = headers.join(',') + '\n';
+            catches.forEach(c => {
+                const row = [
+                    c.date, c.time || '', c.species, c.length, c.weight || '', `"${c.location}"`, `"${c.lure || ''}"`,
+                    c.waterTemp || '', c.airTemp || '', c.pressure || '', c.pressureTrend || '',
+                    c.windSpeed || '', c.windDirection || '', c.skyCondition || '', c.waterClarity || '',
+                    c.fightTime || '', c.depth || '', c.structure || '', c.releaseCondition || '',
+                    c.conditionFactor || '', c.moonPhase ? c.moonPhase.name : '', c.estimatedAge || '',
+                    c.timeOfDay || '', c.isTrophy ? 'Yes' : 'No', `"${(c.notes || '').replace(/"/g, '""')}"`
+                ];
+                csv += row.join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `fishing-data-${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Backup/Restore
+        function exportData() {
+            const data = { catches, exportDate: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `fish-tracker-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data.catches) return alert('Invalid backup file');
+                    
+                    if (catches.length > 0 && !confirm(`Replace ${catches.length} catches with ${data.catches.length} from backup?`)) {
+                        return;
+                    }
+                    
+                    catches = data.catches;
+                    localStorage.setItem('catches', JSON.stringify(catches));
+                    initApp();
+                    alert(`✅ Restored ${catches.length} catches!`);
+                } catch (err) {
+                    alert('Error reading backup');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+    </script>
+</body>
+</html>
