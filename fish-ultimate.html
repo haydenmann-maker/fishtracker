@@ -679,20 +679,27 @@
                 const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD
                 const today = new Date().toISOString().split('T')[0];
                 
+                console.log('Fetching weather for date:', dateStr, 'Today:', today); // DEBUG
+                
                 let url;
                 // Use forecast API for today/future, archive for past
                 if (dateStr >= today) {
                     // Current/future weather - use forecast API
                     url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,precipitation,windspeed_10m,winddirection_10m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FChicago`;
+                    console.log('Using FORECAST API:', url); // DEBUG
                 } else {
                     // Historical weather - use archive API
                     url = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${dateStr}&end_date=${dateStr}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,winddirection_10m_dominant&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FChicago`;
+                    console.log('Using ARCHIVE API:', url); // DEBUG
                 }
                 
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Weather API returned error');
+                console.log('Response status:', response.status, response.ok); // DEBUG
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 
                 const data = await response.json();
+                console.log('API Response data:', data); // DEBUG
                 
                 let avgTemp, windSpeed, windDir, precip;
                 
@@ -703,6 +710,7 @@
                     windSpeed = Math.round(data.current.windspeed_10m);
                     windDir = getWindDirection(data.current.winddirection_10m);
                     precip = data.current.precipitation || 0;
+                    console.log('Parsed CURRENT weather - Temp:', avgTemp, 'Wind:', windSpeed, windDir); // DEBUG
                 } else {
                     // Historical weather from archive API
                     if (!data.daily) throw new Error('No weather data available');
@@ -713,6 +721,7 @@
                     windSpeed = Math.round(daily.windspeed_10m_max[0]);
                     windDir = getWindDirection(daily.winddirection_10m_dominant[0]);
                     precip = daily.precipitation_sum[0];
+                    console.log('Parsed HISTORICAL weather - Temp:', avgTemp, 'Wind:', windSpeed, windDir); // DEBUG
                 }
                 
                 // Estimate water temp based on air temp and season
@@ -738,7 +747,7 @@
                     source: 'api'
                 };
             } catch (error) {
-                console.log('Weather API not available:', error.message);
+                console.error('Weather API error:', error.message, error); // DEBUG
                 return { success: false, error: error.message };
             }
         }
@@ -783,22 +792,26 @@
             // Fetch real weather for Duluth, MN area
             const weather = await fetchRealWeather(dateValue);
             
+            console.log('Weather fetch result:', weather); // DEBUG
+            
             if (!weather.success) {
+                console.log('API failed, using fallback. Error:', weather.error); // DEBUG
                 // Silently fall back to estimates (don't alert - expected in preview)
                 const estimate = estimateWeatherFallback(dateValue);
                 estimate.source = 'estimate';
                 populateWeatherFields(estimate);
-                btn.textContent = '✅ Weather Filled (Seasonal Estimate)';
+                btn.textContent = '⚠️ Using Estimate (API Failed)';
             } else {
+                console.log('API succeeded! Data:', weather); // DEBUG
                 populateWeatherFields(weather);
-                btn.textContent = '✅ Weather Filled (Real Data)';
+                btn.textContent = '✅ Real Data Loaded!';
             }
             
-            // Reset button after 2 seconds
+            // Reset button after 3 seconds
             setTimeout(() => {
                 btn.textContent = originalText;
                 btn.disabled = false;
-            }, 2000);
+            }, 3000);
         }
         
         // Populate weather fields (helper function)
