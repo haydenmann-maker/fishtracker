@@ -43,22 +43,16 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             color: var(--text-primary);
-            position: fixed;
+            min-height: 100vh;
             width: 100%;
-            height: 100%;
-            overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: 0;
-            padding-right: 0;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px 80px 20px;
+            padding: 20px 20px 80px 20px;
         }
         
         header {
@@ -634,7 +628,7 @@
             21: { name: "Lake Sturgeon", minLength: 54, minWeight: 346 },
             22: { name: "Lake Whitefish", minLength: 24, minWeight: 89 }
         };
- 
+
         const mnSpecies = [
             { id: 1, name: "Largemouth Bass", scientific: "Micropterus salmoides" },
             { id: 2, name: "Smallmouth Bass", scientific: "Micropterus dolomieu" },
@@ -683,23 +677,43 @@
             try {
                 const d = new Date(date);
                 const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD
+                const today = new Date().toISOString().split('T')[0];
                 
-                // Open-Meteo API - free, no key required
-                const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${dateStr}&end_date=${dateStr}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,winddirection_10m_dominant&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FChicago`;
+                let url;
+                // Use forecast API for today/future, archive for past
+                if (dateStr >= today) {
+                    // Current/future weather - use forecast API
+                    url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,precipitation,windspeed_10m,winddirection_10m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FChicago`;
+                } else {
+                    // Historical weather - use archive API
+                    url = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${dateStr}&end_date=${dateStr}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,winddirection_10m_dominant&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FChicago`;
+                }
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Weather API returned error');
                 
                 const data = await response.json();
                 
-                if (!data.daily) throw new Error('No weather data available');
+                let avgTemp, windSpeed, windDir, precip;
                 
-                const daily = data.daily;
-                const tempMax = daily.temperature_2m_max[0];
-                const tempMin = daily.temperature_2m_min[0];
-                const avgTemp = Math.round((tempMax + tempMin) / 2);
-                const windSpeed = Math.round(daily.windspeed_10m_max[0]);
-                const windDir = getWindDirection(daily.winddirection_10m_dominant[0]);
+                if (dateStr >= today) {
+                    // Current weather from forecast API
+                    if (!data.current) throw new Error('No current weather data available');
+                    avgTemp = Math.round(data.current.temperature_2m);
+                    windSpeed = Math.round(data.current.windspeed_10m);
+                    windDir = getWindDirection(data.current.winddirection_10m);
+                    precip = data.current.precipitation || 0;
+                } else {
+                    // Historical weather from archive API
+                    if (!data.daily) throw new Error('No weather data available');
+                    const daily = data.daily;
+                    const tempMax = daily.temperature_2m_max[0];
+                    const tempMin = daily.temperature_2m_min[0];
+                    avgTemp = Math.round((tempMax + tempMin) / 2);
+                    windSpeed = Math.round(daily.windspeed_10m_max[0]);
+                    windDir = getWindDirection(daily.winddirection_10m_dominant[0]);
+                    precip = daily.precipitation_sum[0];
+                }
                 
                 // Estimate water temp based on air temp and season
                 const waterTemp = estimateWaterTemp(avgTemp, d.getMonth());
@@ -708,7 +722,6 @@
                 const pressure = (29.92 + (Math.random() * 0.2 - 0.1)).toFixed(2);
                 
                 // Estimate sky condition from precipitation
-                const precip = daily.precipitation_sum[0];
                 let skyCondition = 'sunny';
                 if (precip > 0.1) skyCondition = 'rain';
                 else if (precip > 0) skyCondition = 'overcast';
@@ -725,7 +738,7 @@
                     source: 'api'
                 };
             } catch (error) {
-                console.log('Weather API not available (expected in preview mode):', error.message);
+                console.log('Weather API not available:', error.message);
                 return { success: false, error: error.message };
             }
         }
@@ -2118,4 +2131,3 @@
     </script>
 </body>
 </html>
- 
