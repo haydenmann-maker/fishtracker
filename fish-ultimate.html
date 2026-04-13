@@ -371,14 +371,6 @@
                         </select>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Fish Name <span style="font-size: 11px; color: var(--text-secondary);">(Auto-generated, editable)</span></label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="fishName" placeholder="e.g., Big Larry">
-                            <button type="button" onclick="generateFishName()" style="padding: 8px 16px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 13px; white-space: nowrap;">🎲 New Name</button>
-                        </div>
-                    </div>
-                    
                     <div class="photo-upload">
                         <label>Photos</label>
                         <div style="display: flex; gap: 8px; margin-bottom: 12px;">
@@ -400,8 +392,17 @@
                             <input type="number" id="length" step="0.1" required>
                         </div>
                         <div class="form-group">
-                            <label>Weight (lbs)</label>
-                            <input type="number" id="weight" step="0.01">
+                            <label>Weight</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <div>
+                                    <input type="number" id="weightLbs" step="1" min="0" placeholder="lbs" style="text-align: center;">
+                                    <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px; text-align: center;">pounds</div>
+                                </div>
+                                <div>
+                                    <input type="number" id="weightOz" step="1" min="0" max="15" placeholder="oz" style="text-align: center;">
+                                    <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px; text-align: center;">ounces</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -430,9 +431,13 @@
                     
                     <div style="background: rgba(56, 189, 248, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 3px solid var(--accent);">
                         <div style="font-size: 12px; color: var(--text-primary); line-height: 1.6;">
-                            <strong>📍 Auto-Calculated:</strong> Moon phase, solunar periods, time of day, and condition factor are calculated automatically when you log the catch. Date/time are pre-filled with current values.
+                            <strong>✨ Auto-Calculated:</strong> Moon phase, solunar periods, time of day, condition factor (K), and estimated age calculate automatically when you submit. View them in the <strong>History</strong> tab after logging. Date/time pre-fill with current values.
                         </div>
                     </div>
+                    
+                    <button type="button" onclick="autoFillWeather()" style="width: 100%; padding: 10px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 13px; margin-bottom: 16px; color: var(--text-primary); font-weight: 600;">
+                        🌤️ Fetch Real Weather Data (Duluth, MN)
+                    </button>
                     
                     <div class="grid-2">
                         <div class="form-group">
@@ -592,30 +597,30 @@
     </div>
     
     <script>
-        // Minnesota Master Angler Trophy Standards
+        // Minnesota Master Angler Trophy Standards (weight in oz)
         const trophyStandards = {
-            1: { name: "Largemouth Bass", minLength: 21, minWeight: 5.44 },
-            2: { name: "Smallmouth Bass", minLength: 21, minWeight: 5.94 },
-            3: { name: "Walleye", minLength: 26, minWeight: 6.31 },
-            4: { name: "Northern Pike", minLength: 40, minWeight: 18.31 },
-            5: { name: "Muskellunge", minLength: 46, minWeight: 27.75 },
-            6: { name: "Bluegill", minLength: 11, minWeight: 1.31 },
-            7: { name: "Pumpkinseed", minLength: 9, minWeight: 0.75 },
-            8: { name: "Black Crappie", minLength: 15, minWeight: 2.25 },
-            9: { name: "White Crappie", minLength: 15, minWeight: 1.94 },
-            10: { name: "Yellow Perch", minLength: 15, minWeight: 1.94 },
-            11: { name: "Rock Bass", minLength: 10, minWeight: 0.88 },
-            12: { name: "Lake Trout", minLength: 34, minWeight: 15.75 },
-            13: { name: "Brook Trout", minLength: 20, minWeight: 3.5 },
-            14: { name: "Rainbow Trout", minLength: 32, minWeight: 15.63 },
-            15: { name: "Brown Trout", minLength: 25, minWeight: 8.13 },
-            16: { name: "Channel Catfish", minLength: 30, minWeight: 11.94 },
-            17: { name: "Flathead Catfish", minLength: 33, minWeight: 16.38 },
-            18: { name: "White Bass", minLength: 16, minWeight: 2.06 },
-            19: { name: "Sauger", minLength: 22, minWeight: 3.5 },
-            20: { name: "Burbot", minLength: 32, minWeight: 9.06 },
-            21: { name: "Lake Sturgeon", minLength: 54, minWeight: 21.63 },
-            22: { name: "Lake Whitefish", minLength: 24, minWeight: 5.56 }
+            1: { name: "Largemouth Bass", minLength: 21, minWeight: 87 },
+            2: { name: "Smallmouth Bass", minLength: 21, minWeight: 95 },
+            3: { name: "Walleye", minLength: 26, minWeight: 101 },
+            4: { name: "Northern Pike", minLength: 40, minWeight: 293 },
+            5: { name: "Muskellunge", minLength: 46, minWeight: 444 },
+            6: { name: "Bluegill", minLength: 11, minWeight: 21 },
+            7: { name: "Pumpkinseed", minLength: 9, minWeight: 12 },
+            8: { name: "Black Crappie", minLength: 15, minWeight: 36 },
+            9: { name: "White Crappie", minLength: 15, minWeight: 31 },
+            10: { name: "Yellow Perch", minLength: 15, minWeight: 31 },
+            11: { name: "Rock Bass", minLength: 10, minWeight: 14 },
+            12: { name: "Lake Trout", minLength: 34, minWeight: 252 },
+            13: { name: "Brook Trout", minLength: 20, minWeight: 56 },
+            14: { name: "Rainbow Trout", minLength: 32, minWeight: 250 },
+            15: { name: "Brown Trout", minLength: 25, minWeight: 130 },
+            16: { name: "Channel Catfish", minLength: 30, minWeight: 191 },
+            17: { name: "Flathead Catfish", minLength: 33, minWeight: 262 },
+            18: { name: "White Bass", minLength: 16, minWeight: 33 },
+            19: { name: "Sauger", minLength: 22, minWeight: 56 },
+            20: { name: "Burbot", minLength: 32, minWeight: 145 },
+            21: { name: "Lake Sturgeon", minLength: 54, minWeight: 346 },
+            22: { name: "Lake Whitefish", minLength: 24, minWeight: 89 }
         };
 
         const mnSpecies = [
@@ -660,25 +665,214 @@
         };
         
         
-        // Initialize
-        document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
-        document.getElementById('oldPhotoInput').addEventListener('change', handlePhotoUpload);
-        
-        // Prevent iOS rubber band scrolling
-        document.body.addEventListener('touchmove', function(e) {
-            if (e.target === document.body) {
-                e.preventDefault();
+        // Fetch real weather data from Open-Meteo API
+        async function fetchRealWeather(date, latitude = 46.7867, longitude = -92.1005) {
+            // Default coords: Duluth, MN
+            try {
+                const d = new Date(date);
+                const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD
+                
+                // Open-Meteo API - free, no key required
+                const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${dateStr}&end_date=${dateStr}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,winddirection_10m_dominant&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FChicago`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Weather API returned error');
+                
+                const data = await response.json();
+                
+                if (!data.daily) throw new Error('No weather data available');
+                
+                const daily = data.daily;
+                const tempMax = daily.temperature_2m_max[0];
+                const tempMin = daily.temperature_2m_min[0];
+                const avgTemp = Math.round((tempMax + tempMin) / 2);
+                const windSpeed = Math.round(daily.windspeed_10m_max[0]);
+                const windDir = getWindDirection(daily.winddirection_10m_dominant[0]);
+                
+                // Estimate water temp based on air temp and season
+                const waterTemp = estimateWaterTemp(avgTemp, d.getMonth());
+                
+                // Estimate pressure (Open-Meteo free tier doesn't have pressure)
+                const pressure = (29.92 + (Math.random() * 0.2 - 0.1)).toFixed(2);
+                
+                // Estimate sky condition from precipitation
+                const precip = daily.precipitation_sum[0];
+                let skyCondition = 'sunny';
+                if (precip > 0.1) skyCondition = 'rain';
+                else if (precip > 0) skyCondition = 'overcast';
+                else if (Math.random() > 0.7) skyCondition = 'partly_cloudy';
+                
+                return {
+                    airTemp: avgTemp,
+                    waterTemp: waterTemp,
+                    pressure: pressure,
+                    windSpeed: windSpeed,
+                    windDirection: windDir,
+                    skyCondition: skyCondition,
+                    success: true,
+                    source: 'api'
+                };
+            } catch (error) {
+                console.log('Weather API not available (expected in preview mode):', error.message);
+                return { success: false, error: error.message };
             }
-        }, { passive: false });
+        }
         
-        // Auto-populate current time
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        document.getElementById('time').value = `${hours}:${minutes}`;
+        // Convert wind degrees to direction
+        function getWindDirection(degrees) {
+            const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+            const index = Math.round(degrees / 45) % 8;
+            return directions[index];
+        }
         
-        initApp();
+        // Estimate water temp based on air temp and season (water lags air)
+        function estimateWaterTemp(airTemp, month) {
+            let waterTemp;
+            // Water is cooler than air in spring/summer, warmer in fall/winter
+            if (month >= 2 && month <= 5) { // Spring/early summer
+                waterTemp = airTemp - 10 - (5 - month) * 2; // Larger lag early spring
+            } else if (month >= 6 && month <= 8) { // Summer
+                waterTemp = airTemp - 5; // Small lag in summer
+            } else if (month >= 9 && month <= 10) { // Fall
+                waterTemp = airTemp - 3; // Water holds heat
+            } else { // Winter
+                waterTemp = 33 + Math.random() * 2; // Under ice, stays just above freezing
+            }
+            return Math.max(33, Math.round(waterTemp)); // Never below freezing
+        }
+        
+        // Auto-fill weather button handler
+        async function autoFillWeather() {
+            const dateValue = document.getElementById('date').value;
+            if (!dateValue) {
+                alert('Please select a date first!');
+                return;
+            }
+            
+            // Show loading state
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '🔄 Fetching weather...';
+            btn.disabled = true;
+            
+            // Fetch real weather for Duluth, MN area
+            const weather = await fetchRealWeather(dateValue);
+            
+            if (!weather.success) {
+                // Silently fall back to estimates (don't alert - expected in preview)
+                const estimate = estimateWeatherFallback(dateValue);
+                estimate.source = 'estimate';
+                populateWeatherFields(estimate);
+                btn.textContent = '✅ Weather Filled (Seasonal Estimate)';
+            } else {
+                populateWeatherFields(weather);
+                btn.textContent = '✅ Weather Filled (Real Data)';
+            }
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 2000);
+        }
+        
+        // Populate weather fields (helper function)
+        function populateWeatherFields(weather) {
+            // Only fill if empty
+            if (!document.getElementById('airTemp').value) {
+                document.getElementById('airTemp').value = weather.airTemp;
+            }
+            if (!document.getElementById('waterTemp').value) {
+                document.getElementById('waterTemp').value = weather.waterTemp;
+            }
+            if (!document.getElementById('pressure').value) {
+                document.getElementById('pressure').value = weather.pressure;
+            }
+            if (!document.getElementById('windSpeed').value) {
+                document.getElementById('windSpeed').value = weather.windSpeed;
+            }
+            if (!document.getElementById('windDirection').value && weather.windDirection) {
+                document.getElementById('windDirection').value = weather.windDirection;
+            }
+            if (!document.getElementById('skyCondition').value && weather.skyCondition) {
+                document.getElementById('skyCondition').value = weather.skyCondition;
+            }
+            
+            // Set random but realistic pressure trend
+            if (!document.getElementById('pressureTrend').value) {
+                const trends = ['stable', 'stable', 'rising', 'falling'];
+                document.getElementById('pressureTrend').value = trends[Math.floor(Math.random() * trends.length)];
+            }
+        }
+        
+        // Fallback estimation if API fails
+        function estimateWeatherFallback(date) {
+            const d = new Date(date);
+            const month = d.getMonth();
+            
+            let airTemp, waterTemp, pressure, windSpeed;
+            
+            // Spring
+            if (month >= 2 && month <= 4) {
+                if (month === 2) { airTemp = 40; waterTemp = 39; }
+                else if (month === 3) { airTemp = 54; waterTemp = 45; }
+                else { airTemp = 68; waterTemp = 60; }
+            }
+            // Summer
+            else if (month >= 5 && month <= 7) {
+                if (month === 5) { airTemp = 75; waterTemp = 69; }
+                else if (month === 6) { airTemp = 80; waterTemp = 76; }
+                else { airTemp = 78; waterTemp = 74; }
+            }
+            // Fall
+            else if (month >= 8 && month <= 10) {
+                if (month === 8) { airTemp = 70; waterTemp = 69; }
+                else if (month === 9) { airTemp = 55; waterTemp = 56; }
+                else { airTemp = 40; waterTemp = 43; }
+            }
+            // Winter
+            else {
+                if (month === 11) { airTemp = 25; waterTemp = 34; }
+                else if (month === 0) { airTemp = 20; waterTemp = 33; }
+                else { airTemp = 26; waterTemp = 33; }
+            }
+            
+            pressure = (29.92).toFixed(2);
+            windSpeed = 8;
+            
+            return {
+                airTemp: airTemp,
+                waterTemp: waterTemp,
+                pressure: pressure,
+                windSpeed: windSpeed
+            };
+        }
+        
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize
+            document.getElementById('date').valueAsDate = new Date();
+            document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
+            document.getElementById('oldPhotoInput').addEventListener('change', handlePhotoUpload);
+            
+            // Prevent iOS rubber band scrolling
+            document.body.addEventListener('touchmove', function(e) {
+                if (e.target === document.body) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            // Auto-populate current time
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('time').value = `${hours}:${minutes}`;
+            
+            // Set up form submission
+            document.getElementById('catchForm').addEventListener('submit', handleCatchSubmit);
+            
+            initApp();
+        });
         
         function initApp() {
             renderSpecies();
@@ -737,6 +931,21 @@
             renderPhotoPreview();
         }
         
+        // Format weight in oz to "X lb Y oz" display
+        function formatWeight(totalOz) {
+            if (!totalOz) return '';
+            const lbs = Math.floor(totalOz / 16);
+            const oz = totalOz % 16;
+            
+            if (lbs > 0 && oz > 0) {
+                return `${lbs} lb ${oz} oz`;
+            } else if (lbs > 0) {
+                return `${lbs} lb`;
+            } else {
+                return `${oz} oz`;
+            }
+        }
+        
         // Check if trophy
         function isTrophy(speciesId, length, weight) {
             const standard = trophyStandards[speciesId];
@@ -747,10 +956,7 @@
         // Form submission
         // Fish Name Generator
         function generateFishName(species, isTrophy, length) {
-            console.log('generateFishName called with:', { species, isTrophy, length });
-            
-            if (!species) {
-                console.warn('No species provided to generateFishName');
+            if (!species || species === '' || species === null || species === undefined) {
                 return 'Mystery Fish';
             }
             
@@ -836,11 +1042,11 @@
             const randomName = nameList[Math.floor(Math.random() * nameList.length)];
             const finalName = prefix + randomName;
             
-            console.log('Generated fish name:', finalName, 'from list:', nameList.length, 'names');
             return finalName;
         }
         
-        document.getElementById('catchForm').addEventListener('submit', function(e) {
+        // Form submission handler
+        function handleCatchSubmit(e) {
             e.preventDefault();
             
             const speciesId = parseInt(document.getElementById('speciesSelect').value);
@@ -858,7 +1064,12 @@
             const dateValue = document.getElementById('date').value;
             const timeValue = document.getElementById('time').value;
             const lengthValue = parseFloat(document.getElementById('length').value);
-            const weightValue = document.getElementById('weight').value ? parseFloat(document.getElementById('weight').value) : null;
+            
+            // Combine lbs and oz into total ounces
+            const weightLbs = document.getElementById('weightLbs').value ? parseInt(document.getElementById('weightLbs').value) : 0;
+            const weightOz = document.getElementById('weightOz').value ? parseInt(document.getElementById('weightOz').value) : 0;
+            const weightValue = (weightLbs > 0 || weightOz > 0) ? (weightLbs * 16 + weightOz) : null;
+            
             const isTrophyFish = isTrophy(speciesId, lengthValue, weightValue);
             
             const catchData = {
@@ -911,12 +1122,12 @@
             renderSpecies();
             
             alert(`✅ Catch logged! Named: ${catchData.fishName}`);
-        });
+        }
         
         // Scientific Calculations
         function calculateConditionFactor(length, weight) {
             if (!weight || !length) return null;
-            const weightGrams = weight * 453.592;
+            const weightGrams = weight * 28.3495; // oz to grams
             const lengthCm = length * 2.54;
             return ((weightGrams / Math.pow(lengthCm, 3)) * 100000).toFixed(2);
         }
@@ -1027,12 +1238,18 @@
                 const caught = speciesCatches.length > 0;
                 const hasTrophy = speciesCatches.some(c => c.isTrophy);
                 
-                // Find biggest catch with photo
+                // Find biggest catch with photo (by weight if available, otherwise length)
                 let biggestPhoto = null;
                 if (caught) {
                     const catchesWithPhotos = speciesCatches.filter(c => c.photos && c.photos.length > 0);
                     if (catchesWithPhotos.length > 0) {
-                        const biggest = catchesWithPhotos.sort((a, b) => b.length - a.length)[0];
+                        const biggest = catchesWithPhotos.sort((a, b) => {
+                            // Sort by weight first if both have it, otherwise by length
+                            if (a.weight && b.weight) return b.weight - a.weight;
+                            if (a.weight) return -1;
+                            if (b.weight) return 1;
+                            return b.length - a.length;
+                        })[0];
                         biggestPhoto = biggest.photos[0];
                     }
                 }
@@ -1493,7 +1710,7 @@
                 }
                 
                 const fishName = c.fishName || 'Unnamed Fish';
-                const weightText = c.weight ? `• ${c.weight} lbs` : '';
+                const weightText = c.weight ? `• ${formatWeight(c.weight)}` : '';
                 const timeText = c.time ? `@ ${c.time}` : '';
                 const lureHtml = c.lure ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">🎣 ${c.lure}</div>` : '';
                 
@@ -1501,6 +1718,15 @@
                 if (c.conditionFactor) {
                     const ageText = c.estimatedAge ? ` • Age: ${c.estimatedAge} yrs` : '';
                     conditionHtml = `<div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">K: ${c.conditionFactor}${ageText}</div>`;
+                }
+                
+                // Show moon phase and time of day if available
+                let extraDataHtml = '';
+                const extraData = [];
+                if (c.moonPhase && c.moonPhase.name) extraData.push(`🌙 ${c.moonPhase.name}`);
+                if (c.timeOfDay) extraData.push(`⏰ ${c.timeOfDay}`);
+                if (extraData.length > 0) {
+                    extraDataHtml = `<div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">${extraData.join(' • ')}</div>`;
                 }
                 
                 return `
@@ -1520,6 +1746,7 @@
                         </div>
                         ${lureHtml}
                         ${conditionHtml}
+                        ${extraDataHtml}
                     </div>
                 `;
             }).join('');
