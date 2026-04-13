@@ -30,7 +30,7 @@ A comprehensive progressive web app for tracking fishing catches in Minnesota wa
 
 **Auto-Generated Fish Names (200+ names)**
 - Every catch gets a personality name
-- 70+ bass names inspired by Flair & BamaBass (Bertha, Hoss, Sheila, Bubba, Zeus, etc.)
+- 70+ bass (Bertha, Hoss, Sheila, Bubba, Zeus, etc.)
 - 18-25 names per species
 - Click to edit any name
 - Trophy fish get "Trophy" prefix
@@ -86,34 +86,6 @@ A comprehensive progressive web app for tracking fishing catches in Minnesota wa
 - Solunar major/minor periods
 - Hourly bite ratings
 - Season-specific tactics
-
-## 🚀 Installation
-
-### **Option 1: GitHub Pages (Recommended)**
-This repository is hosted on GitHub Pages. Simply visit:
-```
-https://[your-username].github.io/fish-tracker/fish-ultimate.html
-```
-
-Then bookmark or "Add to Home Screen" on mobile.
-
-### **Option 2: Download Locally**
-1. Download `fish-ultimate.html`
-2. Open in any modern browser (Chrome, Firefox, Safari, Edge)
-3. Bookmark for easy access
-4. Works 100% offline
-
-### **Option 3: Mobile App Experience**
-**iPhone:**
-1. Open the link in Safari
-2. Tap Share button
-3. "Add to Home Screen"
-4. App icon appears on home screen
-
-**Android:**
-1. Open the link in Chrome
-2. Menu (⋮) → "Add to Home screen"
-3. App icon appears on home screen
 
 ## 💾 Data Storage
 
