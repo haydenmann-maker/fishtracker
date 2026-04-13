@@ -49,13 +49,16 @@
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: 0;
+            padding-right: 0;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding-bottom: 80px;
+            padding: 0 20px 80px 20px;
         }
         
         header {
@@ -163,12 +166,21 @@
         }
         
         .species-card.caught {
-            border-color: var(--success);
-            background: rgba(52, 211, 153, 0.1);
+            border-color: #34d399;
+            background: linear-gradient(135deg, 
+                var(--bg-card) 0%, 
+                rgba(52, 211, 153, 0.08) 100%);
+            box-shadow: 0 2px 8px rgba(52, 211, 153, 0.15);
         }
         
         .species-card.uncaught {
-            opacity: 0.4;
+            opacity: 0.5;
+            filter: grayscale(0.5);
+        }
+        
+        .species-card.caught:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 4px rgba(52, 211, 153, 0.2);
         }
         
         .species-name {
@@ -622,7 +634,7 @@
             21: { name: "Lake Sturgeon", minLength: 54, minWeight: 346 },
             22: { name: "Lake Whitefish", minLength: 24, minWeight: 89 }
         };
-
+ 
         const mnSpecies = [
             { id: 1, name: "Largemouth Bass", scientific: "Micropterus salmoides" },
             { id: 2, name: "Smallmouth Bass", scientific: "Micropterus dolomieu" },
@@ -1264,9 +1276,9 @@
                 const countText = caught ? speciesCatches.length + ' caught' : 'Not caught';
                 
                 return `
-                    <div class="species-card ${caught ? 'caught' : 'uncaught'}">
+                    <div class="species-card ${caught ? 'caught' : 'uncaught'}" onclick="${caught ? `showSpeciesHistory(${s.id}, '${s.name}')` : ''}">
                         ${hasTrophy ? '<div class="trophy-badge">🏆</div>' : ''}
-                        <div style="width: 100%; height: 100px; background: ${biggestPhoto ? 'transparent' : 'rgba(255,255,255,0.03)'}; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                        <div style="width: 100%; height: 100px; background: ${biggestPhoto ? 'var(--bg-primary)' : 'rgba(0,0,0,0.2)'}; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
                             ${photoHtml}
                         </div>
                         <div class="species-name">${s.name}</div>
@@ -1274,6 +1286,85 @@
                     </div>
                 `;
             }).join('');
+        }
+        
+        // Show all catches for a specific species
+        function showSpeciesHistory(speciesId, speciesName) {
+            const speciesCatches = catches.filter(c => c.speciesId === speciesId);
+            if (speciesCatches.length === 0) return;
+            
+            // Switch to History tab
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.getElementById('history').classList.add('active');
+            
+            // Find and activate History tab button
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => {
+                if (t.textContent.includes('History')) {
+                    t.classList.add('active');
+                }
+            });
+            
+            // Render filtered history
+            const sorted = [...speciesCatches].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const html = `
+                <div style="margin-bottom: 16px;">
+                    <button onclick="renderHistory(); updateStats();" style="background: var(--bg-secondary); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; color: var(--text-primary); font-size: 13px;">
+                        ← Back to All Catches
+                    </button>
+                    <h2 style="margin-top: 12px; color: var(--accent-light);">${speciesName} (${speciesCatches.length} ${speciesCatches.length === 1 ? 'catch' : 'catches'})</h2>
+                </div>
+            ` + sorted.map(c => {
+                let photosHtml = '';
+                if (c.photos && c.photos.length > 0) {
+                    const photoImgs = c.photos.map(p => `<img src="${p}" onclick="showPhotoModal('${p}')" style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px; cursor: pointer;">`).join('');
+                    photosHtml = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-bottom: 12px;">${photoImgs}</div>`;
+                }
+                
+                const fishName = c.fishName || 'Unnamed Fish';
+                const weightText = c.weight ? `• ${formatWeight(c.weight)}` : '';
+                const timeText = c.time ? `@ ${c.time}` : '';
+                const lureHtml = c.lure ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">🎣 ${c.lure}</div>` : '';
+                
+                let conditionHtml = '';
+                if (c.conditionFactor) {
+                    const ageText = c.estimatedAge ? ` • Age: ${c.estimatedAge} yrs` : '';
+                    conditionHtml = `<div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">K: ${c.conditionFactor}${ageText}</div>`;
+                }
+                
+                let extraDataHtml = '';
+                const extraData = [];
+                if (c.moonPhase && c.moonPhase.name) extraData.push(`🌙 ${c.moonPhase.name}`);
+                if (c.timeOfDay) extraData.push(`⏰ ${c.timeOfDay}`);
+                if (extraData.length > 0) {
+                    extraDataHtml = `<div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">${extraData.join(' • ')}</div>`;
+                }
+                
+                return `
+                    <div style="background: var(--bg-card); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px;">
+                        ${photosHtml}
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
+                            <div>
+                                <div style="font-weight: 700; font-size: 16px;">${c.species} ${c.isTrophy ? '🏆' : ''}</div>
+                                <div style="font-size: 14px; color: var(--accent-light); margin-top: 2px; cursor: pointer;" onclick="editFishName(${c.id})" title="Click to edit name">
+                                    🐟 <span id="fishName-${c.id}">${fishName}</span> ✏️
+                                </div>
+                            </div>
+                        </div>
+                        <div style="color: var(--accent-light); margin-bottom: 8px;">${c.length}" ${weightText}</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            📍 ${c.location} • 📅 ${c.date} ${timeText}
+                        </div>
+                        ${lureHtml}
+                        ${conditionHtml}
+                        ${extraDataHtml}
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('historyContent').innerHTML = html;
         }
         
         // Render Analytics
@@ -2027,3 +2118,4 @@
     </script>
 </body>
 </html>
+ 
