@@ -51,9 +51,15 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px 20px 80px 20px;
+            padding: 20px 16px 80px 16px;
             width: 100%;
             box-sizing: border-box;
+        }
+        
+        @media (min-width: 640px) {
+            .container {
+                padding: 20px 20px 80px 20px;
+            }
         }
         
         header {
@@ -79,11 +85,17 @@
         
         .stats {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-top: 20px;
             width: 100%;
             max-width: 100%;
+        }
+        
+        @media (min-width: 640px) {
+            .stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
         
         .stat-card {
@@ -628,7 +640,7 @@
             21: { name: "Lake Sturgeon", minLength: 54, minWeight: 346 },
             22: { name: "Lake Whitefish", minLength: 24, minWeight: 89 }
         };
- 
+
         const mnSpecies = [
             { id: 1, name: "Largemouth Bass", scientific: "Micropterus salmoides" },
             { id: 2, name: "Smallmouth Bass", scientific: "Micropterus dolomieu" },
@@ -1931,4 +1943,3 @@
     </script>
 </body>
 </html>
- 
